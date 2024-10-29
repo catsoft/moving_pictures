@@ -7,22 +7,23 @@ An Android application designed for frame-by-frame animation creation, allowing 
 - **Interface and Controls**
   - Drawing toolbar with options for pencil, eraser, and additional optional tools
   - Drawing canvas mimicking a paper texture, with a semi-transparent preview of the previous frame to help create smooth animations
-  ![Canvas](images/canvas.jpg "Example of Canvas")
+![Canvas](images/canvas.jpg "Example of Canvas")
 
 
 - Control panel:
   - Undo and redo buttons
   - Frame management: create, delete, and view existing frames
   - Playback control: start and stop animation with looping playback
-  ![top tool bar](images/header.png "Header")
+![top tool bar](images/header.png "Header")
 
 
 - **Drawing Tools**
   - Pencil and eraser with a minimum of 3 color options
   - Undo/redo functionality for the last action
   - Support for unlimited frames
-    ![bottom tool bar](images/header.png "Footer")
-    ![palitra](images/palitra.png "Palitra")
+
+![bottom tool bar](images/header.png "Footer")
+![palitra](images/palitra.png "Palitra")
 
 
 - **Application Requirements**
