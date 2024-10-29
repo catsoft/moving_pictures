@@ -1,10 +1,3 @@
-[Designs]
-https://www.figma.com/design/6QDUA0q5WZV6Fihhw5vPf7/%D0%9F%D1%80%D0%B8%D0%BB%D0%BE%D0%B6%D0%B5%D0%BD%D0%B8%D0%B5-Yandex-Cup-2024-(Copy)?node-id=0-1&t=5LEGC5cfpOYYAQiA-1
-
-[Original technital task]
-https://contest.yandex.ru/contest/69723/problems?lang=ru
-
-
 # Moving Pictures (Android) - Yandex Cup 2024
 
 An Android application designed for frame-by-frame animation creation, allowing users to draw and playback animations on their smartphones. This app pays homage to early animation devices such as the phenakistoscope and zoetrope.
@@ -16,11 +9,13 @@ An Android application designed for frame-by-frame animation creation, allowing 
   - Drawing canvas mimicking a paper texture, with a semi-transparent preview of the previous frame to help create smooth animations
   ![Canvas](images/canvas.jpg "Example of Canvas")
 
-  - Control panel:
-    - Undo and redo buttons
-    - Frame management: create, delete, and view existing frames
-    - Playback control: start and stop animation with looping playback
-    ![top tool bar](images/header.png "Header")
+
+- Control panel:
+  - Undo and redo buttons
+  - Frame management: create, delete, and view existing frames
+  - Playback control: start and stop animation with looping playback
+  ![top tool bar](images/header.png "Header")
+
 
 - **Drawing Tools**
   - Pencil and eraser with a minimum of 3 color options
