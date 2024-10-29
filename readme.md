@@ -22,7 +22,7 @@ An Android application designed for frame-by-frame animation creation, allowing 
   - Undo/redo functionality for the last action
   - Support for unlimited frames
 
-![bottom tool bar](images/header.png "Footer")
+![bottom tool bar](images/tab_bar.png "Footer")
 ![palitra](images/palitra.png "Palitra")
 
 
