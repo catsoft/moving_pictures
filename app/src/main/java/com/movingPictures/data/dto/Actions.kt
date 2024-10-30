@@ -1,31 +1,31 @@
-package com.movingPictures.data
+package com.movingPictures.data.dto
 
 open class Action()
 
-class AddAction(
-    val item: DrawableItem,
+data class AddAction(
+    val item: DrawableItem<*>,
 ) : Action()
 
-class MoveAction(
+data class MoveAction(
     val drawableId: String,
     val newPosition: Point,
 ) : Action()
 
-class RemoveAction(
+data class RemoveAction(
     val drawableId: String,
 ) : Action()
 
-class ChangeColorAction(
+data class ChangeColorAction(
     val drawableId: String,
     val newColor: Int,
 ) : Action()
 
-class RotateAction(
+data class RotateAction(
     val drawableId: String,
     val rotationAngle: Float,
 ) : Action()
 
-class ScaleAction(
+data class ScaleAction(
     val drawableId: String,
     val newScale: Float,
 ) : Action()
