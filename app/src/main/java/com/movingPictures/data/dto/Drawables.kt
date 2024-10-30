@@ -19,7 +19,7 @@ data class DrawableItemState(
 
 data class EraserDrawableItem(
     override val state: DrawableItemState,
-    val radius: Int,
+    val radius: Float = 5F,
     val points: List<PointColors>,
 ) : DrawableItem<EraserDrawableItem> {
     override fun copyWithState(state: DrawableItemState): EraserDrawableItem = EraserDrawableItem(state, radius, points)
@@ -27,18 +27,20 @@ data class EraserDrawableItem(
 
 data class PenDrawableItem(
     override val state: DrawableItemState,
+    val radius: Float = 5F,
     // relative to startPoint
     val points: List<PointColors>,
 ) : DrawableItem<PenDrawableItem> {
-    override fun copyWithState(state: DrawableItemState): PenDrawableItem = PenDrawableItem(state, points)
+    override fun copyWithState(state: DrawableItemState): PenDrawableItem = PenDrawableItem(state, radius, points)
 }
 
 data class LineDrawableItem(
     override val state: DrawableItemState,
+    val width: Float = 5F,
     // relative to startPoint
     val endPoint: Point,
 ) : DrawableItem<LineDrawableItem> {
-    override fun copyWithState(state: DrawableItemState): LineDrawableItem = LineDrawableItem(state, endPoint)
+    override fun copyWithState(state: DrawableItemState): LineDrawableItem = LineDrawableItem(state, width, endPoint)
 }
 
 data class CircleDrawableItem(
