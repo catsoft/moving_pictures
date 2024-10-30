@@ -14,7 +14,7 @@ internal object LightPalette: Palette {
     override val primaryContainer = White
     override val secondaryContainer = Black
     override var iconsDisabled = Gray
-    override val iconsIdle = White
+    override val iconsIdle = Black
     override val iconsActive = Green
     override val colorsSet: List<Color> = colorPaletteSet
 }

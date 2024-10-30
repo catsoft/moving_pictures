@@ -1,4 +1,4 @@
-package com.example.movingPictures.ui.theme.themes
+package com.movingPictures.ui.theme.themes
 
 import android.app.Activity
 import android.os.Build

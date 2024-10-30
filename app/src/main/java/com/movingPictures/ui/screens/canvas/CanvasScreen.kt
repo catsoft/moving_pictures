@@ -22,7 +22,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.movingPictures.ui.theme.colors.ColorPalette
-import com.example.movingPictures.ui.theme.themes.MPTheme
+import com.movingPictures.ui.theme.themes.MPTheme
 import com.movingPictures.compose.MPIcons
 import com.movingpictures.R
 

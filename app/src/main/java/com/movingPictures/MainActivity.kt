@@ -8,7 +8,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
-import com.example.movingPictures.ui.theme.themes.MPTheme
+import com.movingPictures.ui.theme.themes.MPTheme
 import com.movingPictures.ui.screens.canvas.CanvasScreen
 
 class MainActivity : ComponentActivity() {
