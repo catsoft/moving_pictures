@@ -42,10 +42,11 @@ class CanvasViewModel() {
 
     init {
         gifComposer.addFrame(Frame())
-        selectFrame(gifComposer.frames.first().id)
+        gifComposer.addFrame(Frame())
+        selectFrame(gifComposer.frames.last().id)
 
-        doTest()
-        doTest2()
+        doTest(previousFrame.value)
+        doTest2(currentFrame.value)
     }
 
     fun selectFrame(frameId: String) {
@@ -54,8 +55,8 @@ class CanvasViewModel() {
         currentFrame.value = gifComposer.frames.getOrNull(index)
     }
 
-    fun doTest() {
-        currentFrame.value?.let {
+    fun doTest(frame: FrameComposer?) {
+        frame?.let {
             val red = Color.Red.toArgb()
             val blue = Color.Blue.toArgb()
             val green = Color.Green.toArgb()
@@ -68,8 +69,8 @@ class CanvasViewModel() {
         }
     }
 
-    fun doTest2() {
-        currentFrame.value?.let {
+    fun doTest2(frame: FrameComposer?) {
+        frame?.let {
             // Параметры цветов
             val red = Color.Red.toArgb()
             val blue = Color.Blue.toArgb()

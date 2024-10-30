@@ -41,7 +41,7 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
         )
 
         if (previousFrame.value != null) {
-            DrawFrame(Modifier.alpha(0.5f), previousFrame.value!!)
+            DrawFrame(Modifier.alpha(0.3f), previousFrame.value!!)
         }
 
         if (currentFrame.value != null) {
