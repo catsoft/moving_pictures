@@ -17,6 +17,8 @@ import androidx.core.view.WindowCompat
 import com.example.movingPictures.ui.theme.colors.*
 import com.example.movingPictures.ui.theme.colors.ColorPalette
 import com.example.movingPictures.ui.theme.typography.MPTypography
+import com.movingPictures.ui.theme.colors.DarkPalette
+import com.movingPictures.ui.theme.colors.LightPalette
 
 private val lightScheme = lightColorScheme(
     primary = Blue,

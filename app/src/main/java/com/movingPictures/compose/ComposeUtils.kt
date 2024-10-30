@@ -1,4 +1,4 @@
 package com.movingPictures.compose
 
-class ComposeUtils {
-}
+import androidx.compose.ui.Modifier
+
