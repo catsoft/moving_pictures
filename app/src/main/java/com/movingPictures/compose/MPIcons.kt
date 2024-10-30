@@ -30,6 +30,9 @@ object MPIcons {
     fun IcBrush(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_brush, modifier, tint)
 
     @Composable
+    fun IcColorPalette(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_color_palette, modifier, tint)
+
+    @Composable
     fun IcErase(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_erase, modifier, tint)
 
     @Composable
