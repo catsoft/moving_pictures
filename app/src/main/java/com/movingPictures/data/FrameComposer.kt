@@ -10,32 +10,60 @@ import com.movingPictures.data.dto.MoveAction
 import com.movingPictures.data.dto.RemoveAction
 import com.movingPictures.data.dto.RotateAction
 import com.movingPictures.data.dto.ScaleAction
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import java.util.UUID
 
-class FrameComposer(initFrame: Frame = Frame()) {
+class FrameComposer(val initFrame: Frame = Frame()) {
+    private val scope = CoroutineScope(Dispatchers.Default)
+
     val id: String = UUID.randomUUID().toString()
 
     private val duration = initFrame.duration
+    private var historyPosition: MutableStateFlow<Int> = MutableStateFlow(initFrame.history.size - 1)
     private val history = initFrame.history.toMutableList()
-    private val state = initFrame.currentState.toMutableList()
+    private var state = initFrame.currentState.toMutableList()
 
     private val _drawableState = MutableStateFlow(state)
     val drawableState: StateFlow<List<DrawableItem<*>>> = _drawableState
 
-    // todo
-    fun undo() {
+    val canUndo: StateFlow<Boolean> = historyPosition.map { it > -1 }.stateIn(scope, SharingStarted.Eagerly, false)
+    val canRedo: StateFlow<Boolean> = historyPosition.map { it < history.size - 1 }.stateIn(scope, SharingStarted.Eagerly, false)
 
+    fun undo() {
+        if (historyPosition.value == -1) return
+        historyPosition.value--
+        invalidateHistory()
     }
 
-    // todo
     fun redo() {
+        if (historyPosition.value >= history.size) return
+        historyPosition.value++
+        invalidateHistory()
+    }
 
+    private fun invalidateHistory() {
+        state = mutableListOf()
+        history.take(historyPosition.value + 1).forEach { applyActionImpl(it) }
+        _drawableState.value = state
     }
 
     fun applyAction(action: Action) {
+        applyActionImpl(action)
+        if (historyPosition.value < history.size - 1) {
+            history.subList(historyPosition.value + 1, history.size).clear()
+        }
         history.add(action)
+        historyPosition.value++
+        _drawableState.value = state
+    }
+
+    private fun applyActionImpl(action: Action) {
         when (action) {
             is AddAction -> applyAddAction(action)
             is MoveAction -> applyMoveAction(action)
@@ -44,7 +72,6 @@ class FrameComposer(initFrame: Frame = Frame()) {
             is RotateAction -> applyRotateAction(action)
             is ScaleAction -> applyScaleAction(action)
         }
-        _drawableState.value = state
     }
 
     fun composeFrame(): Frame = Frame(duration, history, state)

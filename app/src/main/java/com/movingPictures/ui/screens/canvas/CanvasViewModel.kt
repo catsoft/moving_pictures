@@ -2,11 +2,14 @@ package com.movingPictures.ui.screens.canvas
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.movingPictures.data.FrameComposer
 import com.movingPictures.data.GiftComposer
 import com.movingPictures.data.dto.AddAction
 import com.movingPictures.data.dto.ArrowDrawableItem
 import com.movingPictures.data.dto.CircleDrawableItem
+import com.movingPictures.data.dto.DrawableItem
 import com.movingPictures.data.dto.DrawableItemState
 import com.movingPictures.data.dto.Frame
 import com.movingPictures.data.dto.LineDrawableItem
@@ -15,11 +18,29 @@ import com.movingPictures.data.dto.Point
 import com.movingPictures.data.dto.PointColors
 import com.movingPictures.data.dto.SquareDrawableItem
 import com.movingPictures.data.dto.TriangleDrawableItem
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
-class CanvasViewModel() {
-    val undoButtonState = MutableStateFlow(ControllableState.DISABLED)
-    val redoButtonState = MutableStateFlow(ControllableState.DISABLED)
+@OptIn(ExperimentalCoroutinesApi::class)
+class CanvasViewModel() : ViewModel() {
+    val drawSettings: MutableStateFlow<DrawSettings> = MutableStateFlow(DrawSettings())
+
+    val gifComposer = GiftComposer()
+
+    val previousFrame: MutableStateFlow<FrameComposer?> = MutableStateFlow(null)
+    val currentFrame: MutableStateFlow<FrameComposer?> = MutableStateFlow(null)
+
+
+    val undoButtonState = currentFrame.flatMapLatest { it?.canUndo ?: MutableStateFlow(false) }
+        .map { if (it) ControllableState.IDLE else ControllableState.DISABLED }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
+    val redoButtonState = currentFrame.flatMapLatest { it?.canRedo ?: MutableStateFlow(false) }
+        .map { if (it) ControllableState.IDLE else ControllableState.DISABLED }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
 
     val playButtonState = MutableStateFlow(ControllableState.DISABLED)
     val pauseButtonState = MutableStateFlow(ControllableState.DISABLED)
@@ -34,19 +55,13 @@ class CanvasViewModel() {
     val editButtonState = MutableStateFlow(ControllableState.IDLE)
     val colorButtonState = MutableStateFlow(ControllableState.ACTIVE)
 
-
-    val gifComposer = GiftComposer()
-
-    val previousFrame: MutableStateFlow<FrameComposer?> = MutableStateFlow(null)
-    val currentFrame: MutableStateFlow<FrameComposer?> = MutableStateFlow(null)
-
     init {
         gifComposer.addFrame(Frame())
         gifComposer.addFrame(Frame())
         selectFrame(gifComposer.frames.last().id)
 
-        doTest(previousFrame.value)
-        doTest2(currentFrame.value)
+//        doTest(previousFrame.value)
+//        doTest2(currentFrame.value)
     }
 
     fun selectFrame(frameId: String) {
@@ -102,4 +117,17 @@ class CanvasViewModel() {
             it.applyAction(AddAction(ArrowDrawableItem(DrawableItemState(Point(200f, 500f), orange), arrowPoints2)))
         }
     }
+
+    fun addDrawable(drawableItem: DrawableItem<*>) {
+        currentFrame.value?.applyAction(AddAction(drawableItem))
+    }
+
+    fun undo() {
+        currentFrame.value?.undo()
+    }
+
+    fun redo() {
+        currentFrame.value?.redo()
+    }
 }
+
