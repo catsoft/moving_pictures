@@ -34,6 +34,7 @@ class CanvasViewModel() : ViewModel() {
     val previousFrame: MutableStateFlow<FrameComposer?> = MutableStateFlow(null)
     val currentFrame: MutableStateFlow<FrameComposer?> = MutableStateFlow(null)
 
+    val currentTool: MutableStateFlow<ControlTool> = MutableStateFlow(ControlTool.PEN)
 
     val undoButtonState = currentFrame.flatMapLatest { it?.canUndo ?: MutableStateFlow(false) }
         .map { if (it) ControllableState.IDLE else ControllableState.DISABLED }
@@ -49,9 +50,15 @@ class CanvasViewModel() : ViewModel() {
     val addButtonState = MutableStateFlow(ControllableState.IDLE)
     val layersButtonState = MutableStateFlow(ControllableState.IDLE)
 
-    val penButtonState = MutableStateFlow(ControllableState.IDLE)
-    val brushButtonState = MutableStateFlow(ControllableState.IDLE)
-    val eraserButtonState = MutableStateFlow(ControllableState.IDLE)
+    val penButtonState = currentTool.map { it == ControlTool.PEN }
+        .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
+    val brushButtonState = currentTool.map { it == ControlTool.BRUSH }
+        .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
+    val eraserButtonState = currentTool.map { it == ControlTool.ERASER }
+        .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
     val editButtonState = MutableStateFlow(ControllableState.IDLE)
     val colorButtonState = MutableStateFlow(ControllableState.ACTIVE)
 
@@ -68,6 +75,10 @@ class CanvasViewModel() : ViewModel() {
         val index = gifComposer.frames.indexOfFirst { it.id == frameId }
         previousFrame.value = gifComposer.frames.getOrNull(index - 1) ?: if (gifComposer.frames.size > 1) gifComposer.frames.lastOrNull() else null
         currentFrame.value = gifComposer.frames.getOrNull(index)
+    }
+
+    fun selectTool(tool: ControlTool) {
+        currentTool.value = tool
     }
 
     fun doTest(frame: FrameComposer?) {

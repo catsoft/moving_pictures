@@ -14,6 +14,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -21,9 +23,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.movingPictures.ui.theme.colors.ColorPalette
-import com.movingPictures.ui.theme.themes.MPTheme
 import com.movingPictures.compose.MPIcons
 import com.movingPictures.ui.screens.canvas.canvas.CanvasView
+import com.movingPictures.ui.theme.themes.MPTheme
 
 @Composable
 fun CanvasScreen(modifier: Modifier = Modifier, viewModel: CanvasViewModel = CanvasViewModel()) {
@@ -112,6 +114,8 @@ fun TopBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
 
 @Composable
 fun BottomBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
+    val showColorSelection = remember { mutableStateOf(false) }
+
     Box(
         modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -121,17 +125,17 @@ fun BottomBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
         ) {
             val penButtonState = viewModel.penButtonState.collectAsState()
             ControllableIcon(penButtonState.value) {
-                MPIcons.IcPencil(modifier = mediumIconModifier)
+                MPIcons.IcPencil(modifier = mediumIconModifier.clickable { viewModel.selectTool(ControlTool.PEN) })
             }
 
             val brushState = viewModel.brushButtonState.collectAsState()
             ControllableIcon(brushState.value) {
-                MPIcons.IcBrush(modifier = mediumIconModifier)
+                MPIcons.IcBrush(modifier = mediumIconModifier.clickable { viewModel.selectTool(ControlTool.BRUSH) })
             }
 
             val eraseState = viewModel.eraserButtonState.collectAsState()
             ControllableIcon(eraseState.value) {
-                MPIcons.IcErase(modifier = mediumIconModifier)
+                MPIcons.IcErase(modifier = mediumIconModifier.clickable { viewModel.selectTool(ControlTool.ERASER) })
             }
 
             val editState = viewModel.editButtonState.collectAsState()
@@ -140,15 +144,16 @@ fun BottomBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             }
 
             val colorState = viewModel.colorButtonState.collectAsState()
-            ColorItem(colorState.value)
+            ColorItem(modifier.clickable { showColorSelection.value = true }, colorState.value)
         }
     }
 }
 
 @Composable
-fun ColorItem(state: ControllableState, color: Color = ColorPalette.currentPalette.primary) {
+fun ColorItem(modifier: Modifier, state: ControllableState, color: Color = ColorPalette.currentPalette.primary) {
     Box(
-        modifier = mediumIconModifier
+        modifier = modifier
+            .then(mediumIconModifier)
             .background(color, shape = RoundedCornerShape(16.dp))
             .then(
                 if (state == ControllableState.ACTIVE) Modifier.border(

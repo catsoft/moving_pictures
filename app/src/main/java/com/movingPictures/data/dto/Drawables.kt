@@ -17,14 +17,6 @@ data class DrawableItemState(
     val id: String = UUID.randomUUID().toString(),
 )
 
-data class EraserDrawableItem(
-    override val state: DrawableItemState,
-    val radius: Float = 5F,
-    val points: List<PointColors>,
-) : DrawableItem<EraserDrawableItem> {
-    override fun copyWithState(state: DrawableItemState): EraserDrawableItem = EraserDrawableItem(state, radius, points)
-}
-
 data class PenDrawableItem(
     override val state: DrawableItemState,
     val radius: Float = 5F,
@@ -32,6 +24,14 @@ data class PenDrawableItem(
     val points: List<PointColors>,
 ) : DrawableItem<PenDrawableItem> {
     override fun copyWithState(state: DrawableItemState): PenDrawableItem = PenDrawableItem(state, radius, points)
+}
+
+data class EraserDrawableItem(
+    override val state: DrawableItemState,
+    val radius: Float = 5F,
+    val points: List<PointColors>,
+) : DrawableItem<EraserDrawableItem> {
+    override fun copyWithState(state: DrawableItemState): EraserDrawableItem = EraserDrawableItem(state, radius, points)
 }
 
 data class LineDrawableItem(
