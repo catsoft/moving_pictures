@@ -96,66 +96,42 @@ fun TopBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         val undoButtonState = viewModel.undoButtonState.collectAsState()
-        ControllableIcon(undoButtonState.value) {
-            MPIcons.IcToLeft(
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .then(smallIconModifier)
-                    .clickable { viewModel.undo() }
-            )
+        ControllableIcon(Modifier.padding(end = 8.dp), undoButtonState.value, clickAction = { viewModel.undo() }) {
+            MPIcons.IcToLeft(smallIconModifier)
         }
 
         val redoButtonState = viewModel.redoButtonState.collectAsState()
-        ControllableIcon(redoButtonState.value) {
-            MPIcons.IcToRight(
-                modifier = Modifier
-                    .padding(end = 8.dp)
-                    .then(smallIconModifier)
-                    .clickable { viewModel.redo() }
-            )
+        ControllableIcon(Modifier.padding(end = 8.dp), redoButtonState.value, clickAction = { viewModel.redo() }) {
+            MPIcons.IcToRight(smallIconModifier)
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
         val deleteButtonState = viewModel.deleteButtonState.collectAsState()
-        ControllableIcon(deleteButtonState.value) {
-            MPIcons.IcBin(modifier = mediumIconModifier.clickable { viewModel.deleteFrame() })
+        ControllableIcon(Modifier, deleteButtonState.value, clickAction = { viewModel.deleteFrame() }) {
+            MPIcons.IcBin(mediumIconModifier)
         }
 
         val addButtonState = viewModel.addButtonState.collectAsState()
-        ControllableIcon(addButtonState.value) {
-            MPIcons.IcAddFile(
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .then(mediumIconModifier.clickable { viewModel.addNewFrame() })
-            )
+        ControllableIcon(Modifier.padding(start = 16.dp), addButtonState.value, clickAction = { viewModel.addNewFrame() }) {
+            MPIcons.IcAddFile(mediumIconModifier)
         }
 
         val layersButtonState = viewModel.layersButtonState.collectAsState()
-        ControllableIcon(layersButtonState.value) {
-            MPIcons.IcLayers(
-                modifier = Modifier
-                    .padding(start = 16.dp)
-                    .then(mediumIconModifier)
-            )
+        ControllableIcon(Modifier.padding(start = 16.dp), layersButtonState.value, clickAction = { }) {
+            MPIcons.IcLayers(mediumIconModifier)
         }
 
         Spacer(modifier = Modifier.weight(1f))
 
         val pauseButtonState = viewModel.pauseButtonState.collectAsState()
-        ControllableIcon(pauseButtonState.value) {
-            MPIcons.IcPause(
-                modifier = mediumIconModifier
-            )
+        ControllableIcon(Modifier, pauseButtonState.value, clickAction = { }) {
+            MPIcons.IcPause(mediumIconModifier)
         }
 
         val playButtonState = viewModel.playButtonState.collectAsState()
-        ControllableIcon(playButtonState.value) {
-            MPIcons.IcPlay(
-                modifier = Modifier
-                    .padding(start = 8.dp)
-                    .then(mediumIconModifier)
-            )
+        ControllableIcon(Modifier.padding(start = 8.dp), playButtonState.value, clickAction = { }) {
+            MPIcons.IcPlay(mediumIconModifier)
         }
     }
 }
@@ -170,22 +146,22 @@ fun BottomBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             val penButtonState = viewModel.penButtonState.collectAsState()
-            ControllableIcon(penButtonState.value) {
-                MPIcons.IcPencil(modifier = mediumIconModifier.clickable { viewModel.selectTool(ControlTool.PEN) })
+            ControllableIcon(Modifier, penButtonState.value, clickAction = { viewModel.selectTool(ControlTool.PEN) }) {
+                MPIcons.IcPencil(modifier = mediumIconModifier)
             }
 
             val brushState = viewModel.brushButtonState.collectAsState()
-            ControllableIcon(brushState.value) {
-                MPIcons.IcBrush(modifier = mediumIconModifier.clickable { viewModel.selectTool(ControlTool.BRUSH) })
+            ControllableIcon(Modifier, brushState.value, clickAction = { viewModel.selectTool(ControlTool.BRUSH) }) {
+                MPIcons.IcBrush(modifier = mediumIconModifier)
             }
 
             val eraseState = viewModel.eraserButtonState.collectAsState()
-            ControllableIcon(eraseState.value) {
-                MPIcons.IcErase(modifier = mediumIconModifier.clickable { viewModel.selectTool(ControlTool.ERASER) })
+            ControllableIcon(Modifier, eraseState.value, clickAction = { viewModel.selectTool(ControlTool.ERASER) }) {
+                MPIcons.IcErase(modifier = mediumIconModifier)
             }
 
             val editState = viewModel.editButtonState.collectAsState()
-            ControllableIcon(editState.value) {
+            ControllableIcon(mediumIconModifier, editState.value, clickAction = { }) {
                 MPIcons.IcEdit(modifier = mediumIconModifier)
             }
 

@@ -49,7 +49,8 @@ class CanvasViewModel() : ViewModel() {
     val playButtonState = MutableStateFlow(ControllableState.DISABLED)
     val pauseButtonState = MutableStateFlow(ControllableState.DISABLED)
 
-    val deleteButtonState = MutableStateFlow(ControllableState.IDLE)
+    val deleteButtonState = gifComposer.canRemove.map { if (it) ControllableState.IDLE else ControllableState.DISABLED }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
     val addButtonState = MutableStateFlow(ControllableState.IDLE)
     val layersButtonState = MutableStateFlow(ControllableState.IDLE)
 
@@ -69,21 +70,24 @@ class CanvasViewModel() : ViewModel() {
 
     init {
         gifComposer.addFrame(Frame())
-        gifComposer.addFrame(Frame())
-        selectFrame(gifComposer.frames.last().id)
+        selectFrame(gifComposer.frames.value.last().id)
     }
 
     fun selectFrame(frameId: String) {
-        val index = gifComposer.frames.indexOfFirst { it.id == frameId }
-        previousFrame.value = gifComposer.frames.getOrNull(index - 1) ?: if (gifComposer.frames.size > 1) gifComposer.frames.lastOrNull() else null
-        currentFrame.value = gifComposer.frames.getOrNull(index)
+        val index = gifComposer.frames.value.indexOfFirst { it.id == frameId }
+        previousFrame.value =
+            gifComposer.frames.value.getOrNull(index - 1) ?: if (gifComposer.frames.value.size > 1) gifComposer.frames.value.lastOrNull() else null
+        currentFrame.value = gifComposer.frames.value.getOrNull(index)
     }
 
     fun selectLastFrame() {
-        selectFrame(gifComposer.frames.last().id)
+        selectFrame(gifComposer.frames.value.last().id)
     }
 
     fun selectTool(tool: ControlTool) {
+        if (tool != ControlTool.COLOR_PICKER) {
+            fullPalette.value = false
+        }
         currentTool.value = tool
     }
 

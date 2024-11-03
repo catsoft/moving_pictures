@@ -44,7 +44,7 @@ fun BoxScope.ThicknessSlider(
                 .size(200.dp, (52 - 32).dp)
         ) {
             Slider(
-                valueRange = 1f..100f,
+                valueRange = 1f..50f,
                 value = thickness.value,
                 onValueChange = { thickness.value = it },
                 thumb = { Thumb() },

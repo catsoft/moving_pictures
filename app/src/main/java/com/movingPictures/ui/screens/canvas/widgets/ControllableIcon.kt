@@ -1,10 +1,14 @@
 package com.movingPictures.ui.screens.canvas.widgets
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import com.movingPictures.ui.theme.colors.ColorPalette
 
@@ -19,7 +23,7 @@ enum class ControllableState {
 }
 
 @Composable
-fun ControllableIcon(state: ControllableState, icon: @Composable () -> Unit) {
+fun ControllableIcon(modifier: Modifier, state: ControllableState, clickAction: () -> Unit, icon: @Composable () -> Unit) {
     val color = when (state) {
         ControllableState.DISABLED -> ColorPalette.currentPalette.iconsDisabled
         ControllableState.IDLE -> ColorPalette.currentPalette.iconsIdle
@@ -27,6 +31,16 @@ fun ControllableIcon(state: ControllableState, icon: @Composable () -> Unit) {
     }
 
     CompositionLocalProvider(LocalContentColor.provides(color)) {
-        icon()
+        Box(modifier = modifier
+            .clip(CircleShape)
+            .then(
+                if (state != ControllableState.DISABLED) {
+                    Modifier.clickable { clickAction() }
+                } else {
+                    Modifier
+                }
+            )) {
+            icon()
+        }
     }
 }
