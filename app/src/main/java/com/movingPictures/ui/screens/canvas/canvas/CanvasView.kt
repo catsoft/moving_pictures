@@ -1,5 +1,6 @@
 package com.movingPictures.ui.screens.canvas.canvas
 
+import android.util.Log
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -9,8 +10,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,6 +33,7 @@ import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.zIndex
 import com.movingPictures.data.FrameComposer
 import com.movingPictures.data.dto.AddAction
 import com.movingPictures.data.dto.ArrowDrawableItem
@@ -44,7 +48,6 @@ import com.movingpictures.R
 
 @Composable
 fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
-
     val previousFrame = viewModel.previousFrame.collectAsState()
     val currentFrame = viewModel.currentFrame.collectAsState()
 
@@ -71,36 +74,53 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
                 modifier = Modifier.wrapContentSize()
             )
 
+            // z index for right drawing order
             if (previousFrame.value != null) {
-                DrawFrame(Modifier.alpha(0.3f), previousFrame.value!!)
+                Log.d("CanvasView", "draw previousFrame")
+                DrawFrame(
+                    Modifier
+                        .alpha(0.3f)
+                        .zIndex(4F), previousFrame.value!!
+                )
             }
 
             if (currentFrame.value != null) {
-                DrawFrame(Modifier, currentFrame.value!!)
+                Log.d("CanvasView", "draw currentFrame")
+                DrawFrame(Modifier.zIndex(1F), currentFrame.value!!)
             }
 
             if (currentUserDrawableItem.value != null) {
+                Log.d("CanvasView", "draw userDrawableItem")
                 val frameComposer = FrameComposer()
                 frameComposer.applyAction(AddAction(currentUserDrawableItem.value!!))
-                DrawFrame(Modifier, frameComposer)
+                DrawFrame(Modifier.zIndex(2F), frameComposer)
             }
 
             if (currentEraserDrawableItem.value != null) {
+                Log.d("CanvasView", "draw eraser")
                 val frameComposer = FrameComposer()
                 frameComposer.applyAction(AddAction(currentEraserDrawableItem.value!!))
-                DrawFrame(Modifier, frameComposer)
+                DrawFrame(Modifier.zIndex(3F), frameComposer)
             }
 
             // duplication for right clearing the canvas
-            CanvasWithImage()
+            CanvasWithImage(Modifier.zIndex(4F))
         }
     }
 }
 
 @Composable
-private fun BoxScope.DrawFrame(modifier: Modifier = Modifier, composer: FrameComposer) {
+private fun BoxScope.DrawFrame(modifier: Modifier = Modifier, composer: FrameComposer, zIndex: Float = 0F) {
     val frameState = composer.drawableState.collectAsState()
-    Canvas(modifier.matchParentSize()) {
+    frameState.value.forEach {
+         Log.d("DrawFrame", "drawable: $it")
+    }
+
+    Canvas(
+        modifier
+            .matchParentSize()
+            .zIndex(zIndex)
+    ) {
         for (drawable in frameState.value) {
             withTransform({
                 translate(left = drawable.state.position.x, top = drawable.state.position.y)

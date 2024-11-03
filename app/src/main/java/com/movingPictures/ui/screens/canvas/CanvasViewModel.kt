@@ -22,9 +22,13 @@ import com.movingPictures.ui.screens.canvas.widgets.ControllableState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.last
+import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class CanvasViewModel() : ViewModel() {
@@ -49,7 +53,9 @@ class CanvasViewModel() : ViewModel() {
     val playButtonState = MutableStateFlow(ControllableState.DISABLED)
     val pauseButtonState = MutableStateFlow(ControllableState.DISABLED)
 
-    val deleteButtonState = gifComposer.canRemove.map { if (it) ControllableState.IDLE else ControllableState.DISABLED }
+    val deleteButtonState = gifComposer.frames.map {
+        if (it.size > 1) ControllableState.IDLE else ControllableState.DISABLED
+    }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
     val addButtonState = MutableStateFlow(ControllableState.IDLE)
     val layersButtonState = MutableStateFlow(ControllableState.IDLE)
@@ -70,18 +76,19 @@ class CanvasViewModel() : ViewModel() {
 
     init {
         gifComposer.addFrame(Frame())
-        selectFrame(gifComposer.frames.value.last().id)
-    }
-
-    fun selectFrame(frameId: String) {
-        val index = gifComposer.frames.value.indexOfFirst { it.id == frameId }
-        previousFrame.value =
-            gifComposer.frames.value.getOrNull(index - 1) ?: if (gifComposer.frames.value.size > 1) gifComposer.frames.value.lastOrNull() else null
-        currentFrame.value = gifComposer.frames.value.getOrNull(index)
+        viewModelScope.launch {
+            selectLastFrame()
+        }
     }
 
     fun selectLastFrame() {
-        selectFrame(gifComposer.frames.value.last().id)
+        viewModelScope.launch {
+            gifComposer.frames.collectLatest {
+                val index = it.size - 1
+                previousFrame.value = it.getOrNull(index - 1) ?: if (it.size > 1) it.lastOrNull() else null
+                currentFrame.value = it.getOrNull(index)
+            }
+        }
     }
 
     fun selectTool(tool: ControlTool) {

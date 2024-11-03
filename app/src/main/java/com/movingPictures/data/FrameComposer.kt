@@ -36,6 +36,10 @@ class FrameComposer(val initFrame: Frame = Frame()) {
     val canUndo: StateFlow<Boolean> = historyPosition.map { it > -1 }.stateIn(scope, SharingStarted.Eagerly, false)
     val canRedo: StateFlow<Boolean> = historyPosition.map { it < history.size - 1 }.stateIn(scope, SharingStarted.Eagerly, false)
 
+    init {
+        invalidateHistory()
+    }
+
     fun undo() {
         if (historyPosition.value == -1) return
         historyPosition.value--
@@ -75,7 +79,7 @@ class FrameComposer(val initFrame: Frame = Frame()) {
         }
     }
 
-    fun composeFrame(): Frame = Frame(duration, number, history, state)
+    fun composeFrame(): Frame = Frame(duration, number, history, state, id)
 
     private fun applyAddAction(action: AddAction) {
         state.add(action.item)
