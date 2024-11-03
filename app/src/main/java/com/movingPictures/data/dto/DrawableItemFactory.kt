@@ -14,21 +14,21 @@ object DrawableItemFactory {
 
     fun createCircle(drawSettings: DrawSettings): CircleDrawableItem {
         val center = Point(drawSettings.centerX, drawSettings.centerY)
-        return CircleDrawableItem(DrawableItemState(center, drawSettings.color.toArgb()), drawSettings.shapeWidth / 2)
+        return CircleDrawableItem(DrawableItemState(center, drawSettings.color.toArgb()), drawSettings.shapeSize / 2 * 0.7F, drawSettings.shapeWidth)
     }
 
     fun createSquare(drawSettings: DrawSettings): SquareDrawableItem {
         val center = Point(drawSettings.centerX, drawSettings.centerY)
-        return SquareDrawableItem(DrawableItemState(center, drawSettings.color.toArgb()), drawSettings.shapeWidth)
+        return SquareDrawableItem(DrawableItemState(center, drawSettings.color.toArgb()), drawSettings.shapeSize * 0.7F, drawSettings.shapeWidth)
     }
 
     fun createTriangle(drawSettings: DrawSettings): TriangleDrawableItem {
         val center = Point(drawSettings.centerX, drawSettings.centerY)
-        return TriangleDrawableItem(DrawableItemState(center, drawSettings.color.toArgb()), drawSettings.shapeWidth * 0.7F)
+        return TriangleDrawableItem(DrawableItemState(center, drawSettings.color.toArgb()), drawSettings.shapeSize * 0.7F, drawSettings.shapeWidth)
     }
 
     fun createArrow(drawSettings: DrawSettings): ArrowDrawableItem {
         val center = Point(drawSettings.centerX, drawSettings.centerY)
-        return ArrowDrawableItem(DrawableItemState(center, drawSettings.color.toArgb()), drawSettings.shapeWidth)
+        return ArrowDrawableItem(DrawableItemState(center, drawSettings.color.toArgb()), drawSettings.shapeSize * 0.7F, drawSettings.shapeWidth)
     }
 }

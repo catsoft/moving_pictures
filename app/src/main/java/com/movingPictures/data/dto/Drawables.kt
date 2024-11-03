@@ -46,27 +46,31 @@ data class LineDrawableItem(
 data class CircleDrawableItem(
     override val state: DrawableItemState,
     val radius: Float,
+    val width: Float,
 ) : DrawableItem<CircleDrawableItem> {
-    override fun copyWithState(state: DrawableItemState): CircleDrawableItem = CircleDrawableItem(state, radius)
+    override fun copyWithState(state: DrawableItemState): CircleDrawableItem = CircleDrawableItem(state, radius, width)
 }
 
 data class SquareDrawableItem(
     override val state: DrawableItemState,
     val size: Float,
+    val width: Float,
 ) : DrawableItem<SquareDrawableItem> {
-    override fun copyWithState(state: DrawableItemState): SquareDrawableItem = SquareDrawableItem(state, size)
+    override fun copyWithState(state: DrawableItemState): SquareDrawableItem = SquareDrawableItem(state, size, width)
 }
 
 data class TriangleDrawableItem(
     override val state: DrawableItemState,
     val size: Float,
+    val width: Float,
 ) : DrawableItem<TriangleDrawableItem> {
-    override fun copyWithState(state: DrawableItemState): TriangleDrawableItem = TriangleDrawableItem(state, size)
+    override fun copyWithState(state: DrawableItemState): TriangleDrawableItem = TriangleDrawableItem(state, size, width)
 }
 
 data class ArrowDrawableItem(
     override val state: DrawableItemState,
     val size: Float,
+    val width: Float,
 ) : DrawableItem<ArrowDrawableItem> {
-    override fun copyWithState(state: DrawableItemState): ArrowDrawableItem = ArrowDrawableItem(state, size)
+    override fun copyWithState(state: DrawableItemState): ArrowDrawableItem = ArrowDrawableItem(state, size, width)
 }

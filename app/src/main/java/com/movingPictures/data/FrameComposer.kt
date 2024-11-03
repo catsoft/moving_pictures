@@ -12,7 +12,6 @@ import com.movingPictures.data.dto.RotateAction
 import com.movingPictures.data.dto.ScaleAction
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -34,9 +33,7 @@ class FrameComposer(val initFrame: Frame = Frame()) {
     private var state = initFrame.currentState.toMutableList()
 
     private val _drawableState = MutableSharedFlow<List<DrawableItem<*>>>(replay = 1)
-    private val _drawableState2 = MutableStateFlow<List<DrawableItem<*>>>(state)
     val drawableState: SharedFlow<List<DrawableItem<*>>> = _drawableState
-    val drawableState2: StateFlow<List<DrawableItem<*>>> = MutableStateFlow(state)
 
     val canUndo: StateFlow<Boolean> = historyPosition.map { it > -1 }.stateIn(scope, SharingStarted.Eagerly, false)
     val canRedo: StateFlow<Boolean> = historyPosition.map { it < history.size - 1 }.stateIn(scope, SharingStarted.Eagerly, false)
@@ -61,7 +58,6 @@ class FrameComposer(val initFrame: Frame = Frame()) {
         state = mutableListOf()
         history.take(historyPosition.value + 1).forEach { applyActionImpl(it) }
         _drawableState.tryEmit(state)
-        _drawableState2.value = state.toList()
     }
 
     fun applyAction(action: Action) {
@@ -72,7 +68,6 @@ class FrameComposer(val initFrame: Frame = Frame()) {
         history.add(action)
         historyPosition.value++
         _drawableState.tryEmit(state)
-        _drawableState2.value = state.toList()
     }
 
     private fun applyActionImpl(action: Action) {

@@ -21,8 +21,11 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.StrokeJoin.Companion.Round
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Fill
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
@@ -43,6 +46,7 @@ import com.movingPictures.data.dto.TriangleDrawableItem
 import com.movingPictures.ui.screens.canvas.CanvasViewModel
 import com.movingpictures.R
 
+// todo need objects in draw optimization
 @Composable
 fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
     val previousFrame = viewModel.previousFrame.collectAsState()
@@ -114,13 +118,6 @@ private fun BoxScope.DrawFrame(modifier: Modifier = Modifier, composer: FrameCom
     LaunchedEffect(frameState.value) {
         frameState.value.forEach {
             Log.d("DrawFrame", "drawable: $it")
-        }
-    }
-
-    val frameState2 = composer.drawableState2.collectAsState()
-    LaunchedEffect(frameState2.value) {
-        frameState2.value.forEach {
-            Log.d("DrawFrame2", "drawable: $it")
         }
     }
 
@@ -216,39 +213,42 @@ private fun DrawScope.drawCircle(drawable: CircleDrawableItem) {
         color = Color(drawable.state.color),
         radius = drawable.radius,
         center = Offset(0F, 0F),
-        style = Fill
+        style = drawable.width.toStroke()
     )
 }
 
 private fun DrawScope.drawSquare(drawable: SquareDrawableItem) {
     drawRect(
         color = Color(drawable.state.color),
-        topLeft = Offset(drawable.size / -2, drawable.size / -2),
-        size = Size(drawable.size, drawable.size)
+        size = Size(drawable.size, drawable.size),
+        topLeft = Offset(-drawable.size / 2, -drawable.size / 2),
+        style = drawable.width.toStroke()
     )
 }
 
 private fun DrawScope.drawTriangle(drawable: TriangleDrawableItem) {
     val halfSize = drawable.size / 2f
-    val path = androidx.compose.ui.graphics.Path().apply {
+    val path = Path().apply {
         moveTo(0F, 0F - halfSize)
         lineTo(0F - halfSize, 0F + halfSize)
         lineTo(0F + halfSize, 0F + halfSize)
         close()
     }
-    drawPath(path = path, color = Color(drawable.state.color))
+    drawPath(path = path, color = Color(drawable.state.color), style = drawable.width.toStroke())
 }
 
 private fun DrawScope.drawArrow(drawable: ArrowDrawableItem) {
-    //todo draw arrow
-    val halfSize = drawable.size / 2f
-    val path = androidx.compose.ui.graphics.Path().apply {
-        moveTo(drawable.state.position.x, drawable.state.position.y - halfSize)
-        lineTo(drawable.state.position.x - halfSize, drawable.state.position.y + halfSize)
-        lineTo(drawable.state.position.x + halfSize, drawable.state.position.y + halfSize)
-        close()
+    val height = drawable.size
+    val width = drawable.size * 0.68F
+
+    Path().apply {
+        moveTo(0F, height / 2)
+        lineTo(0F, -height / 2)
+        lineTo(-width / 2, -(width / 2) * 0.70F)
+        moveTo(0F, -height / 2)
+        lineTo(width / 2, -(width / 2) * 0.70F)
     }
-    drawPath(path = path, color = Color(drawable.state.color))
+    drawPath(path = arrowPath, color = Color(drawable.state.color), style = drawable.width.toStroke())
 }
 
 @Composable
@@ -279,3 +279,5 @@ fun CanvasWithImage(modifier: Modifier = Modifier) {
         }
     }
 }
+
+fun Float.toStroke() = Stroke(this, cap = StrokeCap.Round, join = Round)

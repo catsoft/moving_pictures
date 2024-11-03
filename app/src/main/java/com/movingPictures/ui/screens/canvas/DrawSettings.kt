@@ -9,7 +9,7 @@ data class DrawSettings(
     val eraseSize: Float = 15F,
     val eraseColor: Color = Color.Transparent,
 
-    val shapeWidth: Float = 15F,
+    val shapeWidth: Float = 8F,
     val shapeSize: Float = 800F,
 
     val centerX: Float = 500F,

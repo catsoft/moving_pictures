@@ -152,7 +152,7 @@ class CanvasViewModel() : ViewModel() {
     }
 
     fun setCanvasSize(size: IntSize) {
-        drawSettings.value = drawSettings.value.copy(centerX = size.width / 2F, centerY = size.height / 2F, shapeSize = size.width.toFloat() * 0.2F)
+        drawSettings.value = drawSettings.value.copy(centerX = size.width / 2F, centerY = size.height / 2F, shapeSize = size.width.toFloat() * 0.32F)
     }
 
     private fun <T> Flow<T>.combineStateWithPlayState(getState: (T) -> ControllableState): StateFlow<ControllableState> {
