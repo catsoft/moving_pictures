@@ -10,18 +10,18 @@ import com.movingPictures.data.dto.PointColors
 import com.movingPictures.ui.screens.canvas.CanvasViewModel
 
 class PenActionController(canvasViewModel: CanvasViewModel) {
-    val penDrawable = mutableStateOf<PenDrawableItem?>(null)
+    val drawable = mutableStateOf<PenDrawableItem?>(null)
 
-    val onPenDrawUpdate: (Offset) -> Unit = { offset ->
-        if (penDrawable.value != null) {
-            penDrawable.value = penDrawable.value!!.copy(
-                points = penDrawable.value!!.points + PointColors(
-                    offset.toPoint(penDrawable.value!!.state.position),
+    val onDrawUpdate: (Offset) -> Unit = { offset ->
+        if (drawable.value != null) {
+            drawable.value = drawable.value!!.copy(
+                points = drawable.value!!.points + PointColors(
+                    offset.toPoint(drawable.value!!.state.position),
                     canvasViewModel.drawSettings.value.color.toArgb()
                 )
             )
         } else {
-            penDrawable.value = PenDrawableItem(
+            drawable.value = PenDrawableItem(
                 DrawableItemState(
                     position = offset.toPoint(),
                     color = canvasViewModel.drawSettings.value.color.toArgb()
@@ -31,9 +31,9 @@ class PenActionController(canvasViewModel: CanvasViewModel) {
             )
         }
     }
-    val onPenCancel: () -> Unit = {
-        penDrawable.value?.let {
-            penDrawable.value = null
+    val onCancel: () -> Unit = {
+        drawable.value?.let {
+            drawable.value = null
             canvasViewModel.addDrawable(it)
         }
     }

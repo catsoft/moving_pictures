@@ -19,30 +19,30 @@ fun onCurrentTool(viewModel: CanvasViewModel): Modifier {
         detectDragGestures(
             onDragStart = { offset ->
                 when (tool.value) {
-                    ControlTool.PEN -> penActionController.onPenDrawUpdate(offset)
-                    ControlTool.ERASER -> eraserActionController.onEraserDrawUpdate(offset)
+                    ControlTool.PEN -> penActionController.onDrawUpdate(offset)
+                    ControlTool.ERASER -> eraserActionController.onDrawUpdate(offset)
                     else -> {}
                 }
             },
             onDragEnd = {
                 when (tool.value) {
-                    ControlTool.PEN -> penActionController.onPenCancel()
-                    ControlTool.ERASER -> eraserActionController.onEraserCancel()
+                    ControlTool.PEN -> penActionController.onCancel()
+                    ControlTool.ERASER -> eraserActionController.onCancel()
                     else -> {}
                 }
             },
             onDragCancel = {
                 when (tool.value) {
-                    ControlTool.PEN -> penActionController.onPenCancel()
-                    ControlTool.ERASER -> eraserActionController.onEraserCancel()
+                    ControlTool.PEN -> penActionController.onCancel()
+                    ControlTool.ERASER -> eraserActionController.onCancel()
                     else -> {}
                 }
             },
             onDrag = { change, dragAmount ->
                 change.consume()
                 when (tool.value) {
-                    ControlTool.PEN -> penActionController.onPenDrawUpdate(change.position)
-                    ControlTool.ERASER -> eraserActionController.onEraserDrawUpdate(change.position)
+                    ControlTool.PEN -> penActionController.onDrawUpdate(change.position)
+                    ControlTool.ERASER -> eraserActionController.onDrawUpdate(change.position)
                     else -> {}
                 }
             }

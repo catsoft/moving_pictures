@@ -16,17 +16,15 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 import com.movingPictures.compose.MPIcons
-import com.movingPictures.ui.theme.colors.ColorPalette
 import com.movingPictures.ui.screens.canvas.CanvasViewModel
 import com.movingPictures.ui.screens.canvas.ControlTool
+import com.movingPictures.ui.theme.colors.ColorPalette
 
 
 @Composable

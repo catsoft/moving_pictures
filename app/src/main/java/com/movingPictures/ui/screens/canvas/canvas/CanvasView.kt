@@ -12,10 +12,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -24,10 +20,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.BlendMode
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.DrawStyle
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
@@ -48,7 +42,6 @@ import com.movingPictures.data.dto.SquareDrawableItem
 import com.movingPictures.data.dto.TriangleDrawableItem
 import com.movingPictures.ui.screens.canvas.CanvasViewModel
 import com.movingpictures.R
-import java.nio.file.Files.move
 
 @Composable
 fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
@@ -93,7 +86,7 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
                 DrawFrame(Modifier.zIndex(1F), currentFrame.value!!)
             }
 
-            val currentUserDrawableItem = viewModel.penController.penDrawable
+            val currentUserDrawableItem = viewModel.penController.drawable
             if (currentUserDrawableItem.value != null) {
                 Log.d("CanvasView", "draw userDrawableItem")
                 val frameComposer = FrameComposer()
@@ -101,7 +94,7 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
                 DrawFrame(Modifier.zIndex(2F), frameComposer)
             }
 
-            val currentEraserDrawableItem = viewModel.penController.penDrawable
+            val currentEraserDrawableItem = viewModel.penController.drawable
             if (currentEraserDrawableItem.value != null) {
                 Log.d("CanvasView", "draw eraser")
                 val frameComposer = FrameComposer()

@@ -10,18 +10,18 @@ import com.movingPictures.data.dto.PointColors
 import com.movingPictures.ui.screens.canvas.CanvasViewModel
 
 class EraserActionController(canvasViewModel: CanvasViewModel) {
-    val eraserDrawable = mutableStateOf<EraserDrawableItem?>(null)
+    val drawable = mutableStateOf<EraserDrawableItem?>(null)
 
-    val onEraserDrawUpdate: (Offset) -> Unit = { offset ->
-        if (eraserDrawable.value != null) {
-            eraserDrawable.value = eraserDrawable.value!!.copy(
-                points = eraserDrawable.value!!.points + PointColors(
-                    offset.toPoint(eraserDrawable.value!!.state.position),
+    val onDrawUpdate: (Offset) -> Unit = { offset ->
+        if (drawable.value != null) {
+            drawable.value = drawable.value!!.copy(
+                points = drawable.value!!.points + PointColors(
+                    offset.toPoint(drawable.value!!.state.position),
                     canvasViewModel.drawSettings.value.eraseColor.toArgb()
                 )
             )
         } else {
-            eraserDrawable.value = EraserDrawableItem(
+            drawable.value = EraserDrawableItem(
                 DrawableItemState(
                     position = offset.toPoint(),
                     color = canvasViewModel.drawSettings.value.eraseColor.toArgb()
@@ -32,9 +32,9 @@ class EraserActionController(canvasViewModel: CanvasViewModel) {
         }
     }
 
-    val onEraserCancel: () -> Unit = {
-        eraserDrawable.value?.let {
-            eraserDrawable.value = null
+    val onCancel: () -> Unit = {
+        drawable.value?.let {
+            drawable.value = null
             canvasViewModel.addDrawable(it)
         }
     }

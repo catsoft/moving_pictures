@@ -5,20 +5,14 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.movingPictures.data.FrameComposer
 import com.movingPictures.data.GiftComposer
 import com.movingPictures.data.dto.AddAction
-import com.movingPictures.data.dto.CircleDrawableItem
 import com.movingPictures.data.dto.DrawableItem
 import com.movingPictures.data.dto.DrawableItemFactory
 import com.movingPictures.data.dto.DrawableItemState
 import com.movingPictures.data.dto.Frame
-import com.movingPictures.data.dto.LineDrawableItem
 import com.movingPictures.data.dto.PenDrawableItem
 import com.movingPictures.data.dto.Point
-import com.movingPictures.data.dto.PointColors
-import com.movingPictures.data.dto.SquareDrawableItem
-import com.movingPictures.data.dto.TriangleDrawableItem
 import com.movingPictures.ui.screens.canvas.canvas.EraserActionController
 import com.movingPictures.ui.screens.canvas.canvas.PenActionController
 import com.movingPictures.ui.screens.canvas.widgets.ControllableState
@@ -26,11 +20,11 @@ import com.movingPictures.ui.screens.canvas.widgets.Shape
 import com.movingPictures.ui.screens.canvas.widgets.activeOrIdle
 import com.movingPictures.ui.screens.canvas.widgets.idleOrDisabled
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
@@ -148,6 +142,13 @@ class CanvasViewModel() : ViewModel() {
             Shape.ARROW -> DrawableItemFactory.createArrow(settings)
         }
         addDrawable(drawableItem)
+        // crunch for canvas update ???
+        penController.drawable.value = PenDrawableItem(DrawableItemState(Point(0F, 0F), Color.Transparent.toArgb()), 0F, mutableListOf())
+        viewModelScope.launch {
+            //lolos
+            delay(2)
+            penController.drawable.value = null
+        }
     }
 
     fun setCanvasSize(size: IntSize) {
