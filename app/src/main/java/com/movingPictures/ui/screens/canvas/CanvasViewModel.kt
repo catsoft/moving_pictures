@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.movingPictures.data.FrameComposer
 import com.movingPictures.data.GiftComposer
 import com.movingPictures.data.dto.AddAction
-import com.movingPictures.data.dto.ArrowDrawableItem
 import com.movingPictures.data.dto.CircleDrawableItem
 import com.movingPictures.data.dto.DrawableItem
 import com.movingPictures.data.dto.DrawableItemFactory
@@ -26,9 +25,8 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.last
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -38,9 +36,11 @@ class CanvasViewModel() : ViewModel() {
     val drawSettings: MutableStateFlow<DrawSettings> = MutableStateFlow(DrawSettings())
 
     val gifComposer = GiftComposer()
+    val gifState = GifState(gifComposer)
+    val gifPlayer = GifPlayer(gifComposer, gifState)
 
-    val previousFrame: MutableStateFlow<FrameComposer?> = MutableStateFlow(null)
-    val currentFrame: MutableStateFlow<FrameComposer?> = MutableStateFlow(null)
+    val previousFrame = gifState.previousFrame
+    val currentFrame = gifState.currentFrame
 
     val currentTool: MutableStateFlow<ControlTool> = MutableStateFlow(ControlTool.PEN)
     val fullPalette: MutableStateFlow<Boolean> = MutableStateFlow(false)
@@ -53,12 +53,22 @@ class CanvasViewModel() : ViewModel() {
         .map { if (it) ControllableState.IDLE else ControllableState.DISABLED }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
 
-    val playButtonState = MutableStateFlow(ControllableState.DISABLED)
-    val pauseButtonState = MutableStateFlow(ControllableState.DISABLED)
+    val playButtonState = gifPlayer.playState.combine(gifPlayer.playerState) { playState, playerState ->
+        when {
+            playerState == PlayerState.NOT_READY -> ControllableState.DISABLED
+            playState == PlayState.PLAYING -> ControllableState.ACTIVE
+            else -> ControllableState.IDLE
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
+    val pauseButtonState = gifPlayer.playState.combine(gifPlayer.playerState) { playState, playerState ->
+        when {
+            playerState == PlayerState.NOT_READY -> ControllableState.DISABLED
+            playState == PlayState.PAUSED -> ControllableState.DISABLED
+            else -> ControllableState.IDLE
+        }
+    }.stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
 
-    val deleteButtonState = gifComposer.frames.map {
-        if (it.size > 1) ControllableState.IDLE else ControllableState.DISABLED
-    }
+    val deleteButtonState = gifComposer.frames.map { if (it.size > 1) ControllableState.IDLE else ControllableState.DISABLED }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
     val addButtonState = MutableStateFlow(ControllableState.IDLE)
     val layersButtonState = MutableStateFlow(ControllableState.IDLE)
@@ -81,19 +91,7 @@ class CanvasViewModel() : ViewModel() {
 
     init {
         gifComposer.addFrame(Frame())
-        viewModelScope.launch {
-            selectLastFrame()
-        }
-    }
-
-    fun selectLastFrame() {
-        viewModelScope.launch {
-            gifComposer.frames.collectLatest {
-                val index = it.size - 1
-                previousFrame.value = it.getOrNull(index - 1) ?: if (it.size > 1) it.lastOrNull() else null
-                currentFrame.value = it.getOrNull(index)
-            }
-        }
+        gifState.selectLastFrame()
     }
 
     fun selectTool(tool: ControlTool) {
@@ -131,14 +129,18 @@ class CanvasViewModel() : ViewModel() {
     fun addNewFrame() {
         currentFrame.value ?: return
         gifComposer.addFrame(currentFrame.value!!.composeFrame())
-        selectLastFrame()
+        gifState.selectLastFrame()
     }
 
     fun deleteFrame() {
         currentFrame.value ?: return
         gifComposer.removeFrame(currentFrame.value!!.id)
-        selectLastFrame()
+        gifState.selectLastFrame()
     }
+
+    fun play() = gifPlayer.play()
+
+    fun pause() = gifPlayer.pause()
 
     fun addShapes(shape: Shape) {
         val settings = drawSettings.value
@@ -199,4 +201,3 @@ class CanvasViewModel() : ViewModel() {
         }
     }
 }
-

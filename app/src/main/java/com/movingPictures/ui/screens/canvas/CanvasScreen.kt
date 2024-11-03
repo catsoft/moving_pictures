@@ -134,12 +134,12 @@ fun TopBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
         Spacer(modifier = Modifier.weight(1f))
 
         val pauseButtonState = viewModel.pauseButtonState.collectAsState()
-        ControllableIcon(Modifier, pauseButtonState.value, clickAction = { }) {
+        ControllableIcon(Modifier, pauseButtonState.value, clickAction = { viewModel.pause() }) {
             MPIcons.IcPause(mediumIconModifier)
         }
 
         val playButtonState = viewModel.playButtonState.collectAsState()
-        ControllableIcon(Modifier.padding(start = 8.dp), playButtonState.value, clickAction = { }) {
+        ControllableIcon(Modifier.padding(start = 8.dp), playButtonState.value, clickAction = { viewModel.play() }) {
             MPIcons.IcPlay(mediumIconModifier)
         }
     }

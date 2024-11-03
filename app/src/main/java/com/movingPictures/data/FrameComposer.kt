@@ -25,7 +25,7 @@ class FrameComposer(val initFrame: Frame = Frame()) {
     val id: String = UUID.randomUUID().toString()
     var number: Long = initFrame.number + 1
 
-    private val duration = initFrame.duration
+    val duration = initFrame.duration
     private var historyPosition: MutableStateFlow<Int> = MutableStateFlow(initFrame.history.size - 1)
     private val history = initFrame.history.toMutableList()
     private var state = initFrame.currentState.toMutableList()
