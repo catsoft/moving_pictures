@@ -19,6 +19,8 @@ import com.movingPictures.data.dto.Point
 import com.movingPictures.data.dto.PointColors
 import com.movingPictures.data.dto.SquareDrawableItem
 import com.movingPictures.data.dto.TriangleDrawableItem
+import com.movingPictures.ui.screens.canvas.canvas.EraserActionController
+import com.movingPictures.ui.screens.canvas.canvas.PenActionController
 import com.movingPictures.ui.screens.canvas.widgets.ControllableState
 import com.movingPictures.ui.screens.canvas.widgets.Shape
 import com.movingPictures.ui.screens.canvas.widgets.activeOrIdle
@@ -42,6 +44,9 @@ class CanvasViewModel() : ViewModel() {
     val gifComposer = GiftComposer()
     val gifState = GifState(gifComposer)
     val gifPlayer = GifPlayer(gifComposer, gifState)
+
+    val penController = PenActionController(this)
+    val eraserController = EraserActionController(this)
 
     val previousFrame = gifState.previousFrame
     val currentFrame = gifState.currentFrame
@@ -158,48 +163,5 @@ class CanvasViewModel() : ViewModel() {
                 else -> getState(secondState)
             }
         }.stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
-    }
-
-    fun doTest(frame: FrameComposer?) {
-        frame?.let {
-            val red = Color.Red.toArgb()
-            val blue = Color.Blue.toArgb()
-            val green = Color.Green.toArgb()
-            val yellow = Color.Yellow.toArgb()
-
-            it.applyAction(AddAction(LineDrawableItem(DrawableItemState(Point(50f, 50f), red), 5F, Point(150f, 50f))))
-            it.applyAction(AddAction(LineDrawableItem(DrawableItemState(Point(150f, 50f), blue), 5F, Point(150f, 150f))))
-            it.applyAction(AddAction(LineDrawableItem(DrawableItemState(Point(150f, 150f), green), 5F, Point(50f, 150f))))
-            it.applyAction(AddAction(LineDrawableItem(DrawableItemState(Point(50f, 150f), yellow), 5F, Point(50f, 50f))))
-        }
-    }
-
-    fun doTest2(frame: FrameComposer?) {
-        frame?.let {
-            // Параметры цветов
-            val red = Color.Red.toArgb()
-            val blue = Color.Blue.toArgb()
-            val green = Color.Green.toArgb()
-            val yellow = Color.Yellow.toArgb()
-            val purple = Color.Magenta.toArgb()
-            val orange = Color(0xFFFFA500).toArgb()
-
-            val penPoints1 = listOf(PointColors(Point(50f, 50f), red))
-            val penPoints2 = listOf(PointColors(Point(200f, 50f), blue))
-            it.applyAction(AddAction(PenDrawableItem(DrawableItemState(Point(50f, 50f), red), 5f, penPoints1)))
-            it.applyAction(AddAction(PenDrawableItem(DrawableItemState(Point(200f, 50f), blue), 5f, penPoints2)))
-
-            it.applyAction(AddAction(LineDrawableItem(DrawableItemState(Point(50f, 150f), green), 5F, Point(150f, 150f))))
-            it.applyAction(AddAction(LineDrawableItem(DrawableItemState(Point(200f, 150f), yellow), 5F, Point(300f, 150f))))
-
-            it.applyAction(AddAction(CircleDrawableItem(DrawableItemState(Point(100f, 250f), purple), 40F)))
-            it.applyAction(AddAction(CircleDrawableItem(DrawableItemState(Point(250f, 250f), orange), 40F)))
-
-            it.applyAction(AddAction(SquareDrawableItem(DrawableItemState(Point(50f, 350f), red), 60F)))
-            it.applyAction(AddAction(SquareDrawableItem(DrawableItemState(Point(200f, 350f), green), 60F)))
-
-            it.applyAction(AddAction(TriangleDrawableItem(DrawableItemState(Point(100f, 450f), blue), 50F)))
-            it.applyAction(AddAction(TriangleDrawableItem(DrawableItemState(Point(250f, 450f), yellow), 50F)))
-        }
     }
 }

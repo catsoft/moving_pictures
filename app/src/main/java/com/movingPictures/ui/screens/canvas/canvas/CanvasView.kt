@@ -55,9 +55,6 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
     val previousFrame = viewModel.previousFrame.collectAsState()
     val currentFrame = viewModel.currentFrame.collectAsState()
 
-    val currentUserDrawableItem = remember { mutableStateOf<PenDrawableItem?>(null) }
-    val currentEraserDrawableItem = remember { mutableStateOf<EraserDrawableItem?>(null) }
-
     Box(
         modifier
             .fillMaxWidth(),
@@ -67,7 +64,7 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             modifier = modifier
                 .wrapContentSize()
                 .clip(RoundedCornerShape(20.dp))
-                .then(onCurrentTool(viewModel, currentUserDrawableItem, currentEraserDrawableItem))
+                .then(onCurrentTool(viewModel))
                 .onGloballyPositioned {
                     viewModel.setCanvasSize(it.size)
                 },
@@ -96,6 +93,7 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
                 DrawFrame(Modifier.zIndex(1F), currentFrame.value!!)
             }
 
+            val currentUserDrawableItem = viewModel.penController.penDrawable
             if (currentUserDrawableItem.value != null) {
                 Log.d("CanvasView", "draw userDrawableItem")
                 val frameComposer = FrameComposer()
@@ -103,6 +101,7 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
                 DrawFrame(Modifier.zIndex(2F), frameComposer)
             }
 
+            val currentEraserDrawableItem = viewModel.penController.penDrawable
             if (currentEraserDrawableItem.value != null) {
                 Log.d("CanvasView", "draw eraser")
                 val frameComposer = FrameComposer()
@@ -118,9 +117,18 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
 
 @Composable
 private fun BoxScope.DrawFrame(modifier: Modifier = Modifier, composer: FrameComposer, zIndex: Float = 0F) {
-    val frameState = composer.drawableState.collectAsState()
-    frameState.value.forEach {
-        Log.d("DrawFrame", "drawable: $it")
+    val frameState = composer.drawableState.collectAsState(listOf())
+    LaunchedEffect(frameState.value) {
+        frameState.value.forEach {
+            Log.d("DrawFrame", "drawable: $it")
+        }
+    }
+
+    val frameState2 = composer.drawableState2.collectAsState()
+    LaunchedEffect(frameState2.value) {
+        frameState2.value.forEach {
+            Log.d("DrawFrame2", "drawable: $it")
+        }
     }
 
     Canvas(
