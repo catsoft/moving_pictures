@@ -25,6 +25,7 @@ import com.movingPictures.ui.screens.canvas.widgets.ColorPicker
 import com.movingPictures.ui.screens.canvas.widgets.ColorPickerPopup
 import com.movingPictures.ui.screens.canvas.widgets.ControllableIcon
 import com.movingPictures.ui.screens.canvas.widgets.FrameNumbers
+import com.movingPictures.ui.screens.canvas.widgets.ShapeSelector
 import com.movingPictures.ui.screens.canvas.widgets.ThicknessSlider
 import com.movingPictures.ui.screens.canvas.widgets.mediumIconModifier
 import com.movingPictures.ui.screens.canvas.widgets.smallIconModifier
@@ -85,6 +86,14 @@ fun CanvasScreen(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
                 .padding(start = 16.dp, top = 82.dp),
             currentFrame.value,
             previousFrame.value
+        )
+
+        ShapeSelector(
+            Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 82.dp),
+            show = tools.value == ControlTool.SHAPES,
+            viewModel
         )
     }
 }
@@ -161,7 +170,7 @@ fun BottomBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             }
 
             val editState = viewModel.editButtonState.collectAsState()
-            ControllableIcon(mediumIconModifier, editState.value, clickAction = { }) {
+            ControllableIcon(mediumIconModifier, editState.value, clickAction = { viewModel.selectTool(ControlTool.SHAPES) }) {
                 MPIcons.IcEdit(modifier = mediumIconModifier)
             }
 

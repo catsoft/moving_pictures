@@ -6,4 +6,5 @@ enum class ControlTool {
     BRUSH,
     COLOR_PICKER,
     ERASER,
+    SHAPES,
 }

@@ -51,6 +51,9 @@ object MPIcons {
     fun IcArrowUp(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_arrow_up, modifier, tint)
 
     @Composable
+    fun IcLine(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_line, modifier, tint)
+
+    @Composable
     fun IcCircle(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_circle, modifier, tint)
 
     @Composable

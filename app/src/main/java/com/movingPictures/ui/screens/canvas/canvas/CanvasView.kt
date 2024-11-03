@@ -27,8 +27,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.DrawStyle
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntSize
@@ -45,6 +48,7 @@ import com.movingPictures.data.dto.SquareDrawableItem
 import com.movingPictures.data.dto.TriangleDrawableItem
 import com.movingPictures.ui.screens.canvas.CanvasViewModel
 import com.movingpictures.R
+import java.nio.file.Files.move
 
 @Composable
 fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
@@ -63,7 +67,10 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             modifier = modifier
                 .wrapContentSize()
                 .clip(RoundedCornerShape(20.dp))
-                .then(onCurrentTool(viewModel, currentUserDrawableItem, currentEraserDrawableItem)),
+                .then(onCurrentTool(viewModel, currentUserDrawableItem, currentEraserDrawableItem))
+                .onGloballyPositioned {
+                    viewModel.setCanvasSize(it.size)
+                },
             contentAlignment = Alignment.Center
         ) {
             // duplication for right size
@@ -113,7 +120,7 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
 private fun BoxScope.DrawFrame(modifier: Modifier = Modifier, composer: FrameComposer, zIndex: Float = 0F) {
     val frameState = composer.drawableState.collectAsState()
     frameState.value.forEach {
-         Log.d("DrawFrame", "drawable: $it")
+        Log.d("DrawFrame", "drawable: $it")
     }
 
     Canvas(
@@ -197,7 +204,7 @@ private fun DrawScope.drawEraser(drawable: EraserDrawableItem) {
 private fun DrawScope.drawLine(drawable: LineDrawableItem) {
     drawLine(
         color = Color(drawable.state.color),
-        start = Offset(drawable.state.position.x, drawable.state.position.y),
+        start = Offset(0F, 0F),
         end = Offset(drawable.endPoint.x, drawable.endPoint.y),
         strokeWidth = drawable.width
     )
@@ -206,20 +213,33 @@ private fun DrawScope.drawLine(drawable: LineDrawableItem) {
 private fun DrawScope.drawCircle(drawable: CircleDrawableItem) {
     drawCircle(
         color = Color(drawable.state.color),
-        radius = drawable.radius.toFloat(),
-        center = Offset(drawable.state.position.x, drawable.state.position.y)
+        radius = drawable.radius,
+        center = Offset(0F, 0F),
+        style = Fill
     )
 }
 
 private fun DrawScope.drawSquare(drawable: SquareDrawableItem) {
     drawRect(
         color = Color(drawable.state.color),
-        topLeft = Offset(drawable.state.position.x, drawable.state.position.y),
-        size = Size(drawable.size.toFloat(), drawable.size.toFloat())
+        topLeft = Offset(drawable.size / -2, drawable.size / -2),
+        size = Size(drawable.size, drawable.size)
     )
 }
 
 private fun DrawScope.drawTriangle(drawable: TriangleDrawableItem) {
+    val halfSize = drawable.size / 2f
+    val path = androidx.compose.ui.graphics.Path().apply {
+        moveTo(0F, 0F - halfSize)
+        lineTo(0F - halfSize, 0F + halfSize)
+        lineTo(0F + halfSize, 0F + halfSize)
+        close()
+    }
+    drawPath(path = path, color = Color(drawable.state.color))
+}
+
+private fun DrawScope.drawArrow(drawable: ArrowDrawableItem) {
+    //todo draw arrow
     val halfSize = drawable.size / 2f
     val path = androidx.compose.ui.graphics.Path().apply {
         moveTo(drawable.state.position.x, drawable.state.position.y - halfSize)
@@ -228,37 +248,6 @@ private fun DrawScope.drawTriangle(drawable: TriangleDrawableItem) {
         close()
     }
     drawPath(path = path, color = Color(drawable.state.color))
-}
-
-private fun DrawScope.drawArrow(drawable: ArrowDrawableItem) {
-    if (drawable.points.size < 2) return
-    val (start, end) = drawable.points.let { it.first().point to it.last().point }
-    drawLine(
-        color = Color(drawable.state.color),
-        start = Offset(start.x, start.y),
-        end = Offset(end.x, end.y),
-        strokeWidth = 5f
-    )
-    val arrowSize = 10f
-    val angle = kotlin.math.atan2(end.y - start.y, end.x - start.x)
-    drawLine(
-        color = Color(drawable.state.color),
-        start = Offset(end.x, end.y),
-        end = Offset(
-            end.x - arrowSize * kotlin.math.cos(angle - Math.PI / 6).toFloat(),
-            end.y - arrowSize * kotlin.math.sin(angle - Math.PI / 6).toFloat()
-        ),
-        strokeWidth = 5f
-    )
-    drawLine(
-        color = Color(drawable.state.color),
-        start = Offset(end.x, end.y),
-        end = Offset(
-            end.x - arrowSize * kotlin.math.cos(angle + Math.PI / 6).toFloat(),
-            end.y - arrowSize * kotlin.math.sin(angle + Math.PI / 6).toFloat()
-        ),
-        strokeWidth = 5f
-    )
 }
 
 @Composable

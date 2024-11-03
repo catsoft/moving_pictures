@@ -2,6 +2,7 @@ package com.movingPictures.ui.screens.canvas
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.IntSize
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.movingPictures.data.FrameComposer
@@ -10,6 +11,7 @@ import com.movingPictures.data.dto.AddAction
 import com.movingPictures.data.dto.ArrowDrawableItem
 import com.movingPictures.data.dto.CircleDrawableItem
 import com.movingPictures.data.dto.DrawableItem
+import com.movingPictures.data.dto.DrawableItemFactory
 import com.movingPictures.data.dto.DrawableItemState
 import com.movingPictures.data.dto.Frame
 import com.movingPictures.data.dto.LineDrawableItem
@@ -19,6 +21,7 @@ import com.movingPictures.data.dto.PointColors
 import com.movingPictures.data.dto.SquareDrawableItem
 import com.movingPictures.data.dto.TriangleDrawableItem
 import com.movingPictures.ui.screens.canvas.widgets.ControllableState
+import com.movingPictures.ui.screens.canvas.widgets.Shape
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -69,7 +72,9 @@ class CanvasViewModel() : ViewModel() {
     val eraserButtonState = currentTool.map { it == ControlTool.ERASER }
         .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
-    val editButtonState = MutableStateFlow(ControllableState.IDLE)
+    val editButtonState = currentTool.map { it == ControlTool.SHAPES }
+        .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
     val colorButtonState = currentTool.map { it == ControlTool.COLOR_PICKER }
         .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
@@ -135,6 +140,21 @@ class CanvasViewModel() : ViewModel() {
         selectLastFrame()
     }
 
+    fun addShapes(shape: Shape) {
+        val settings = drawSettings.value
+        val drawableItem = when (shape) {
+            Shape.LINE -> DrawableItemFactory.createLine(settings)
+            Shape.RECTANGLE -> DrawableItemFactory.createSquare(settings)
+            Shape.CIRCLE -> DrawableItemFactory.createCircle(settings)
+            Shape.TRIANGLE -> DrawableItemFactory.createTriangle(settings)
+            Shape.ARROW -> DrawableItemFactory.createArrow(settings)
+        }
+        addDrawable(drawableItem)
+    }
+
+    fun setCanvasSize(size: IntSize) {
+        drawSettings.value = drawSettings.value.copy(centerX = size.width / 2F, centerY = size.height / 2F, shapeSize = size.width.toFloat() * 0.2F)
+    }
 
     fun doTest(frame: FrameComposer?) {
         frame?.let {
@@ -168,21 +188,15 @@ class CanvasViewModel() : ViewModel() {
             it.applyAction(AddAction(LineDrawableItem(DrawableItemState(Point(50f, 150f), green), 5F, Point(150f, 150f))))
             it.applyAction(AddAction(LineDrawableItem(DrawableItemState(Point(200f, 150f), yellow), 5F, Point(300f, 150f))))
 
-            it.applyAction(AddAction(CircleDrawableItem(DrawableItemState(Point(100f, 250f), purple), 40)))
-            it.applyAction(AddAction(CircleDrawableItem(DrawableItemState(Point(250f, 250f), orange), 40)))
+            it.applyAction(AddAction(CircleDrawableItem(DrawableItemState(Point(100f, 250f), purple), 40F)))
+            it.applyAction(AddAction(CircleDrawableItem(DrawableItemState(Point(250f, 250f), orange), 40F)))
 
-            it.applyAction(AddAction(SquareDrawableItem(DrawableItemState(Point(50f, 350f), red), 60)))
-            it.applyAction(AddAction(SquareDrawableItem(DrawableItemState(Point(200f, 350f), green), 60)))
+            it.applyAction(AddAction(SquareDrawableItem(DrawableItemState(Point(50f, 350f), red), 60F)))
+            it.applyAction(AddAction(SquareDrawableItem(DrawableItemState(Point(200f, 350f), green), 60F)))
 
-            it.applyAction(AddAction(TriangleDrawableItem(DrawableItemState(Point(100f, 450f), blue), 50)))
-            it.applyAction(AddAction(TriangleDrawableItem(DrawableItemState(Point(250f, 450f), yellow), 50)))
-
-            val arrowPoints1 = listOf(PointColors(Point(0f, 0f), purple), PointColors(Point(50f, 50f), purple))
-            val arrowPoints2 = listOf(PointColors(Point(0f, 0f), orange), PointColors(Point(50f, -50f), orange))
-            it.applyAction(AddAction(ArrowDrawableItem(DrawableItemState(Point(50f, 500f), purple), arrowPoints1)))
-            it.applyAction(AddAction(ArrowDrawableItem(DrawableItemState(Point(200f, 500f), orange), arrowPoints2)))
+            it.applyAction(AddAction(TriangleDrawableItem(DrawableItemState(Point(100f, 450f), blue), 50F)))
+            it.applyAction(AddAction(TriangleDrawableItem(DrawableItemState(Point(250f, 450f), yellow), 50F)))
         }
     }
-
 }
 
