@@ -21,9 +21,13 @@ import com.movingPictures.data.dto.SquareDrawableItem
 import com.movingPictures.data.dto.TriangleDrawableItem
 import com.movingPictures.ui.screens.canvas.widgets.ControllableState
 import com.movingPictures.ui.screens.canvas.widgets.Shape
+import com.movingPictures.ui.screens.canvas.widgets.activeOrIdle
+import com.movingPictures.ui.screens.canvas.widgets.idleOrDisabled
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
@@ -45,13 +49,12 @@ class CanvasViewModel() : ViewModel() {
     val currentTool: MutableStateFlow<ControlTool> = MutableStateFlow(ControlTool.PEN)
     val fullPalette: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
-    //todo map refactor
-    val undoButtonState = currentFrame.flatMapLatest { it?.canUndo ?: MutableStateFlow(false) }
-        .map { if (it) ControllableState.IDLE else ControllableState.DISABLED }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
-    val redoButtonState = currentFrame.flatMapLatest { it?.canRedo ?: MutableStateFlow(false) }
-        .map { if (it) ControllableState.IDLE else ControllableState.DISABLED }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
+    val undoButtonState = currentFrame.flatMapLatest { it?.canUndo ?: MutableStateFlow(false) }.combineStateWithPlayState {
+        it.idleOrDisabled()
+    }
+    val redoButtonState = currentFrame.flatMapLatest { it?.canRedo ?: MutableStateFlow(false) }.combineStateWithPlayState {
+        it.idleOrDisabled()
+    }
 
     val playButtonState = gifPlayer.playState.combine(gifPlayer.playerState) { playState, playerState ->
         when {
@@ -68,26 +71,15 @@ class CanvasViewModel() : ViewModel() {
         }
     }.stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
 
-    val deleteButtonState = gifComposer.frames.map { if (it.size > 1) ControllableState.IDLE else ControllableState.DISABLED }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
-    val addButtonState = MutableStateFlow(ControllableState.IDLE)
-    val layersButtonState = MutableStateFlow(ControllableState.IDLE)
+    val deleteButtonState = gifComposer.frames.combineStateWithPlayState { (it.size > 1).idleOrDisabled() }
+    val addButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
+    val layersButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
 
-    val penButtonState = currentTool.map { it == ControlTool.PEN }
-        .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
-    val brushButtonState = currentTool.map { it == ControlTool.BRUSH }
-        .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
-    val eraserButtonState = currentTool.map { it == ControlTool.ERASER }
-        .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
-    val editButtonState = currentTool.map { it == ControlTool.SHAPES }
-        .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
-    val colorButtonState = currentTool.map { it == ControlTool.COLOR_PICKER }
-        .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
-        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
+    val penButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.PEN).activeOrIdle() }
+    val brushButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.BRUSH).activeOrIdle() }
+    val eraserButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.ERASER).activeOrIdle() }
+    val colorButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.COLOR_PICKER).activeOrIdle() }
+    val editButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.SHAPES).activeOrIdle() }
 
     init {
         gifComposer.addFrame(Frame())
@@ -100,7 +92,6 @@ class CanvasViewModel() : ViewModel() {
         }
         currentTool.value = tool
     }
-
 
     fun addDrawable(drawableItem: DrawableItem<*>) {
         currentFrame.value?.applyAction(AddAction(drawableItem))
@@ -156,6 +147,17 @@ class CanvasViewModel() : ViewModel() {
 
     fun setCanvasSize(size: IntSize) {
         drawSettings.value = drawSettings.value.copy(centerX = size.width / 2F, centerY = size.height / 2F, shapeSize = size.width.toFloat() * 0.2F)
+    }
+
+    private fun <T> Flow<T>.combineStateWithPlayState(getState: (T) -> ControllableState): StateFlow<ControllableState> {
+        return combine(gifPlayer.playState) { first, second ->
+            first to second
+        }.map { (secondState, isPlaying) ->
+            when {
+                isPlaying == PlayState.PLAYING -> ControllableState.DISABLED
+                else -> getState(secondState)
+            }
+        }.stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
     }
 
     fun doTest(frame: FrameComposer?) {

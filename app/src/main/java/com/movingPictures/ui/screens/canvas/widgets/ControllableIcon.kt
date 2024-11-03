@@ -23,6 +23,10 @@ enum class ControllableState {
     ACTIVE
 }
 
+fun Boolean.activeOrIdle(): ControllableState = if (this) ControllableState.ACTIVE else ControllableState.IDLE
+
+fun Boolean.idleOrDisabled(): ControllableState = if (this) ControllableState.IDLE else ControllableState.DISABLED
+
 @Composable
 fun ControllableIcon(modifier: Modifier, state: ControllableState, clickAction: () -> Unit, icon: @Composable () -> Unit) {
     val color = when (state) {
