@@ -13,6 +13,9 @@ class GiftComposer(initGif: Gif = Gif(listOf())) {
         } else {
             _frames.add(FrameComposer(frame))
         }
+        for (i in _frames.indices) {
+            _frames[i].number = i + 1L
+        }
     }
 
     fun moveFrame(frameId: String, newPosition: Int) {

@@ -4,5 +4,6 @@ enum class ControlTool {
     MOVE,
     PEN,
     BRUSH,
+    COLOR_PICKER,
     ERASER,
 }

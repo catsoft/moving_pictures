@@ -1,4 +1,4 @@
-package com.example.movingPictures.ui.theme.colors
+package com.movingPictures.ui.theme.colors
 
 import androidx.compose.ui.graphics.Color
 
@@ -10,7 +10,6 @@ val White = Color(0xFFFFFFFF)
 val Black = Color(0xFF000000)
 val Red = Color(0xFFFF3D00)
 val Gray = Color(0xFF8B8B8B)
-
 
 
 // color palette
@@ -40,6 +39,16 @@ val BrightOrange = Color(0xFFFC7600)
 val Pink = Color(0xFFFF95D5)
 val Peach = Color(0xFFFFD1A9)
 val PaleYellow = Color(0xFFFFFECC)
+
+val GreenGradientStart = Color(0xFFEAFFAB)
+val GreenGradientEnd = Color(0xFF9CCB0C)
+
+val shortColorSet = listOf(
+    White,
+    Red,
+    Black,
+    Blue
+)
 
 val colorPaletteSet = listOf(
     SkyBlue,

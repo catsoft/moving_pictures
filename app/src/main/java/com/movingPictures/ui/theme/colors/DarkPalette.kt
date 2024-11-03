@@ -1,12 +1,6 @@
 package com.movingPictures.ui.theme.colors
 
 import androidx.compose.ui.graphics.Color
-import com.example.movingPictures.ui.theme.colors.Black
-import com.example.movingPictures.ui.theme.colors.Blue
-import com.example.movingPictures.ui.theme.colors.Gray
-import com.example.movingPictures.ui.theme.colors.Green
-import com.example.movingPictures.ui.theme.colors.White
-import com.example.movingPictures.ui.theme.colors.colorPaletteSet
 
 internal object DarkPalette: Palette {
     override val primary = Blue
@@ -16,5 +10,8 @@ internal object DarkPalette: Palette {
     override var iconsDisabled = Gray
     override val iconsIdle = White
     override val iconsActive = Green
+
+    override val shortColorsSet: List<Color> = shortColorSet
     override val colorsSet: List<Color> = colorPaletteSet
+    override val greenGradient: List<Color> = listOf(GreenGradientStart, GreenGradientEnd)
 }

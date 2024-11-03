@@ -7,6 +7,7 @@ data class Gif(val frames: List<Frame>)
 data class Frame(
     // in ms
     val duration: Long = 5,
+    val number: Long = 1,
     val history: MutableList<Action> = mutableListOf(),
     val currentState: MutableList<DrawableItem<*>> = mutableListOf(),
     val id: String = UUID.randomUUID().toString(),

@@ -172,28 +172,6 @@ private fun DrawScope.drawEraser(drawable: EraserDrawableItem) {
             blendMode = BlendMode.Clear
         )
     }
-
-    for (pointColor in drawable.points) {
-        drawCircle(
-            color = Color(pointColor.color),
-            radius = drawable.radius,
-            center = Offset(pointColor.point.x, pointColor.point.y),
-        )
-    }
-
-    if (drawable.points.size < 2) return
-
-    for (i in 0 until drawable.points.size - 1) {
-        val startPoint = drawable.points[i]
-        val endPoint = drawable.points[i + 1]
-
-        drawLine(
-            color = Color(startPoint.color),
-            start = Offset(startPoint.point.x, startPoint.point.y),
-            end = Offset(endPoint.point.x, endPoint.point.y),
-            strokeWidth = drawable.radius * 2,
-        )
-    }
 }
 
 private fun DrawScope.drawLine(drawable: LineDrawableItem) {

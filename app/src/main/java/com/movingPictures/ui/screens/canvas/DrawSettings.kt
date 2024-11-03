@@ -1,11 +1,13 @@
 package com.movingPictures.ui.screens.canvas
 
 import androidx.compose.ui.graphics.Color
+import com.movingPictures.ui.theme.colors.ColorPalette
 
-class DrawSettings {
-    var color: Color = Color.Red
-    var width: Float = 5F
+data class DrawSettings(
+    val color: Color = ColorPalette.currentPalette.primary,
+    val penSize: Float = 5F,
+    val eraseSize: Float = 15F,
+    val eraseColor: Color = Color.Transparent,
+
     val size: Float = 40F
-    var eraseSize: Float = 15F
-    var eraseColor = Color.Transparent
-}
+)

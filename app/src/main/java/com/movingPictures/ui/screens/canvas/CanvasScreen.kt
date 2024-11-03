@@ -1,7 +1,5 @@
 package com.movingPictures.ui.screens.canvas
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -11,33 +9,83 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.movingPictures.ui.theme.colors.ColorPalette
 import com.movingPictures.compose.MPIcons
 import com.movingPictures.ui.screens.canvas.canvas.CanvasView
+import com.movingPictures.ui.screens.canvas.widgets.ColorFullPalettePickerPopup
+import com.movingPictures.ui.screens.canvas.widgets.ColorPicker
+import com.movingPictures.ui.screens.canvas.widgets.ColorPickerPopup
+import com.movingPictures.ui.screens.canvas.widgets.ControllableIcon
+import com.movingPictures.ui.screens.canvas.widgets.FrameNumbers
+import com.movingPictures.ui.screens.canvas.widgets.ThicknessSlider
+import com.movingPictures.ui.screens.canvas.widgets.mediumIconModifier
+import com.movingPictures.ui.screens.canvas.widgets.smallIconModifier
 import com.movingPictures.ui.theme.themes.MPTheme
 
 @Composable
-fun CanvasScreen(modifier: Modifier = Modifier, viewModel: CanvasViewModel = CanvasViewModel()) {
-    Column(modifier.fillMaxSize()) {
-        TopBar(modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp), viewModel)
-        CanvasView(
+fun CanvasScreen(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
+    Box(modifier.fillMaxSize()) {
+        Column(modifier.fillMaxSize()) {
+            TopBar(modifier = Modifier.padding(16.dp, 16.dp, 16.dp, 0.dp), viewModel)
+            CanvasView(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(16.dp),
+                viewModel
+            )
+            BottomBar(modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 16.dp), viewModel)
+        }
+
+        val tools = viewModel.currentTool.collectAsState()
+        ColorPickerPopup(tools.value == ControlTool.COLOR_PICKER, viewModel)
+
+        val fullPalette = viewModel.fullPalette.collectAsState()
+        ColorFullPalettePickerPopup(fullPalette.value, viewModel)
+
+        val settings = viewModel.drawSettings.collectAsState()
+        val penThickness = remember { mutableFloatStateOf(settings.value.penSize) }
+        LaunchedEffect(penThickness.floatValue) {
+            viewModel.setPenSize(penThickness.floatValue)
+        }
+        ThicknessSlider(
             modifier = Modifier
-                .weight(1f)
-                .padding(16.dp),
-            viewModel
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 82.dp),
+            show = tools.value == ControlTool.PEN,
+            viewModel = viewModel,
+            thickness = penThickness
         )
-        BottomBar(modifier = Modifier.padding(16.dp, 0.dp, 16.dp, 16.dp), viewModel)
+
+        val eraserThickness = remember { mutableFloatStateOf(settings.value.eraseSize) }
+        LaunchedEffect(eraserThickness.floatValue) {
+            viewModel.setEraseSize(eraserThickness.floatValue)
+        }
+        ThicknessSlider(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 82.dp),
+            show = tools.value == ControlTool.ERASER,
+            viewModel = viewModel,
+            thickness = eraserThickness
+        )
+
+        val currentFrame = viewModel.currentFrame.collectAsState()
+        val previousFrame = viewModel.previousFrame.collectAsState()
+        FrameNumbers(
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(start = 16.dp, top = 82.dp),
+            currentFrame.value,
+            previousFrame.value
+        )
     }
 }
 
@@ -71,7 +119,7 @@ fun TopBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
 
         val deleteButtonState = viewModel.deleteButtonState.collectAsState()
         ControllableIcon(deleteButtonState.value) {
-            MPIcons.IcBin(modifier = mediumIconModifier)
+            MPIcons.IcBin(modifier = mediumIconModifier.clickable { viewModel.deleteFrame() })
         }
 
         val addButtonState = viewModel.addButtonState.collectAsState()
@@ -79,7 +127,7 @@ fun TopBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             MPIcons.IcAddFile(
                 modifier = Modifier
                     .padding(start = 16.dp)
-                    .then(mediumIconModifier)
+                    .then(mediumIconModifier.clickable { viewModel.addNewFrame() })
             )
         }
 
@@ -114,8 +162,6 @@ fun TopBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
 
 @Composable
 fun BottomBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
-    val showColorSelection = remember { mutableStateOf(false) }
-
     Box(
         modifier.fillMaxWidth(),
         contentAlignment = Alignment.Center
@@ -143,29 +189,8 @@ fun BottomBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
                 MPIcons.IcEdit(modifier = mediumIconModifier)
             }
 
-            val colorState = viewModel.colorButtonState.collectAsState()
-            ColorItem(modifier.clickable { showColorSelection.value = true }, colorState.value)
+            ColorPicker(Modifier, viewModel)
         }
-    }
-}
-
-@Composable
-fun ColorItem(modifier: Modifier, state: ControllableState, color: Color = ColorPalette.currentPalette.primary) {
-    Box(
-        modifier = modifier
-            .then(mediumIconModifier)
-            .background(color, shape = RoundedCornerShape(16.dp))
-            .then(
-                if (state == ControllableState.ACTIVE) Modifier.border(
-                    width = 2.dp,
-                    color = ColorPalette.currentPalette.iconsActive,
-                    shape = RoundedCornerShape(16.dp)
-                )
-                else Modifier
-            )
-            .clip(RoundedCornerShape(16.dp))
-    ) {
-
     }
 }
 
@@ -173,8 +198,6 @@ fun ColorItem(modifier: Modifier, state: ControllableState, color: Color = Color
 @Composable
 fun GreetingPreview() {
     MPTheme {
-        CanvasScreen()
+        CanvasScreen(Modifier, CanvasViewModel())
     }
 }
-
-

@@ -14,11 +14,17 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.example.movingPictures.ui.theme.colors.*
-import com.example.movingPictures.ui.theme.colors.ColorPalette
+import com.movingPictures.ui.theme.colors.ColorPalette
 import com.example.movingPictures.ui.theme.typography.MPTypography
+import com.movingPictures.ui.theme.colors.Black
+import com.movingPictures.ui.theme.colors.Blue
 import com.movingPictures.ui.theme.colors.DarkPalette
+import com.movingPictures.ui.theme.colors.Gray
+import com.movingPictures.ui.theme.colors.Green
 import com.movingPictures.ui.theme.colors.LightPalette
+import com.movingPictures.ui.theme.colors.Pink80
+import com.movingPictures.ui.theme.colors.Red
+import com.movingPictures.ui.theme.colors.White
 
 private val lightScheme = lightColorScheme(
     primary = Blue,

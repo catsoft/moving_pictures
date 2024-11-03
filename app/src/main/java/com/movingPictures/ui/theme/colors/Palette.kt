@@ -10,5 +10,7 @@ interface Palette {
     var iconsDisabled: Color
     val iconsIdle: Color
     val iconsActive: Color
+    val shortColorsSet: List<Color>
     val colorsSet: List<Color>
+    val greenGradient: List<Color>
 }

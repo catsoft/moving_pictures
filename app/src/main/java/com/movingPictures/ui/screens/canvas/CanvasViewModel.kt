@@ -18,6 +18,7 @@ import com.movingPictures.data.dto.Point
 import com.movingPictures.data.dto.PointColors
 import com.movingPictures.data.dto.SquareDrawableItem
 import com.movingPictures.data.dto.TriangleDrawableItem
+import com.movingPictures.ui.screens.canvas.widgets.ControllableState
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -35,7 +36,9 @@ class CanvasViewModel() : ViewModel() {
     val currentFrame: MutableStateFlow<FrameComposer?> = MutableStateFlow(null)
 
     val currentTool: MutableStateFlow<ControlTool> = MutableStateFlow(ControlTool.PEN)
+    val fullPalette: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
+    //todo map refactor
     val undoButtonState = currentFrame.flatMapLatest { it?.canUndo ?: MutableStateFlow(false) }
         .map { if (it) ControllableState.IDLE else ControllableState.DISABLED }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
@@ -60,15 +63,14 @@ class CanvasViewModel() : ViewModel() {
         .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
         .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
     val editButtonState = MutableStateFlow(ControllableState.IDLE)
-    val colorButtonState = MutableStateFlow(ControllableState.ACTIVE)
+    val colorButtonState = currentTool.map { it == ControlTool.COLOR_PICKER }
+        .map { if (it) ControllableState.ACTIVE else ControllableState.IDLE }
+        .stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.IDLE)
 
     init {
         gifComposer.addFrame(Frame())
         gifComposer.addFrame(Frame())
         selectFrame(gifComposer.frames.last().id)
-
-//        doTest(previousFrame.value)
-//        doTest2(currentFrame.value)
     }
 
     fun selectFrame(frameId: String) {
@@ -77,9 +79,51 @@ class CanvasViewModel() : ViewModel() {
         currentFrame.value = gifComposer.frames.getOrNull(index)
     }
 
+    fun selectLastFrame() {
+        selectFrame(gifComposer.frames.last().id)
+    }
+
     fun selectTool(tool: ControlTool) {
         currentTool.value = tool
     }
+
+
+    fun addDrawable(drawableItem: DrawableItem<*>) {
+        currentFrame.value?.applyAction(AddAction(drawableItem))
+    }
+
+    fun undo() {
+        currentFrame.value?.undo()
+    }
+
+    fun redo() {
+        currentFrame.value?.redo()
+    }
+
+    fun selectColor(color: Color) {
+        drawSettings.value = drawSettings.value.copy(color = color)
+    }
+
+    fun setPenSize(value: Float) {
+        drawSettings.value = drawSettings.value.copy(penSize = value)
+    }
+
+    fun setEraseSize(value: Float) {
+        drawSettings.value = drawSettings.value.copy(eraseSize = value)
+    }
+
+    fun addNewFrame() {
+        currentFrame.value ?: return
+        gifComposer.addFrame(currentFrame.value!!.composeFrame())
+        selectLastFrame()
+    }
+
+    fun deleteFrame() {
+        currentFrame.value ?: return
+        gifComposer.removeFrame(currentFrame.value!!.id)
+        selectLastFrame()
+    }
+
 
     fun doTest(frame: FrameComposer?) {
         frame?.let {
@@ -129,16 +173,5 @@ class CanvasViewModel() : ViewModel() {
         }
     }
 
-    fun addDrawable(drawableItem: DrawableItem<*>) {
-        currentFrame.value?.applyAction(AddAction(drawableItem))
-    }
-
-    fun undo() {
-        currentFrame.value?.undo()
-    }
-
-    fun redo() {
-        currentFrame.value?.redo()
-    }
 }
 

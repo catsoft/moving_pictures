@@ -10,15 +10,19 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.ui.Modifier
 import com.movingPictures.ui.theme.themes.MPTheme
 import com.movingPictures.ui.screens.canvas.CanvasScreen
+import com.movingPictures.ui.screens.canvas.CanvasViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
         enableEdgeToEdge()
         setContent {
             MPTheme {
+                val viewModel = CanvasViewModel()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    CanvasScreen(modifier = Modifier.padding(innerPadding))
+                    CanvasScreen(modifier = Modifier.padding(innerPadding), viewModel)
                 }
             }
         }

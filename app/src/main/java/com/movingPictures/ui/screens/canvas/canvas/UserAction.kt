@@ -25,6 +25,7 @@ fun onCurrentTool(
     val drawSettings = viewModel.drawSettings.collectAsState()
     val tool = viewModel.currentTool.collectAsState()
 
+    //todo refactor for input handling
     val onPenDrawUpdate: (Offset) -> Unit = { offset ->
         if (penDrawable.value != null) {
             penDrawable.value = penDrawable.value!!.copy(
@@ -39,7 +40,7 @@ fun onCurrentTool(
                     position = offset.toPoint(),
                     color = drawSettings.value.color.toArgb()
                 ),
-                drawSettings.value.width,
+                drawSettings.value.penSize,
                 mutableListOf(PointColors(offset.toPoint(offset.toPoint()), drawSettings.value.color.toArgb()))
             )
         }

@@ -23,6 +23,7 @@ class FrameComposer(val initFrame: Frame = Frame()) {
     private val scope = CoroutineScope(Dispatchers.Default)
 
     val id: String = UUID.randomUUID().toString()
+    var number: Long = initFrame.number + 1
 
     private val duration = initFrame.duration
     private var historyPosition: MutableStateFlow<Int> = MutableStateFlow(initFrame.history.size - 1)
@@ -74,7 +75,7 @@ class FrameComposer(val initFrame: Frame = Frame()) {
         }
     }
 
-    fun composeFrame(): Frame = Frame(duration, history, state)
+    fun composeFrame(): Frame = Frame(duration, number, history, state)
 
     private fun applyAddAction(action: AddAction) {
         state.add(action.item)

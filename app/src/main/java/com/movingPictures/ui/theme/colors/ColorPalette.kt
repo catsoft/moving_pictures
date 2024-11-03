@@ -1,6 +1,4 @@
-package com.example.movingPictures.ui.theme.colors
-
-import com.movingPictures.ui.theme.colors.Palette
+package com.movingPictures.ui.theme.colors
 
 object ColorPalette {
     lateinit var currentPalette: Palette
