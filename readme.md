@@ -2,6 +2,29 @@
 
 An Android application designed for frame-by-frame animation creation, allowing users to draw and playback animations on their smartphones. This app pays homage to early animation devices such as the phenakistoscope and zoetrope.
 
+## Knowing issues
+- No blocking execution on actions
+  - Fix by moving all actions to IO\Default state and do at least screen blocking
+  - You can reproduce it on fast layer duplication
+- Glowing on popups
+  - It's because of the custom BlurSurface implementation. It's cool and easy solution for that short time, but it can be fixed by reworking the layer snapshot
+- Drawing object optimization
+  - Have to optimize Path, Offset, and eth
+  - It should use hashmap for drawing objects to cached objects
+
+## Implementation
+- [All features with videos](https://drive.google.com/drive/folders/1MnbSmebaZYbH1EDEs9NnTONmD3n-J2JU?usp=drive_link)
+- [Drawing](https://drive.google.com/file/d/125_KzbLbZMrlcfcOHQLezu3oDaFurwyh/view?usp=drive_link)
+- [Eraser](https://drive.google.com/file/d/1QdGe01SDlVOQe8Y6mFR0YrsH_LalNPkR/view?usp=drive_link)
+- [Back and forward](https://drive.google.com/file/d/1MJXI_uA7aOYTLY2EC_8rx1jsbdiMpis9/view?usp=drive_link)
+- [Shapes](https://drive.google.com/file/d/1pHhkPrlmGUVbCZ-8rH9uO4IxuQrepPpk/view?usp=drive_link)
+- [Color selection](https://drive.google.com/file/d/1qWJcvMf-kWOI-Xx42fTbNSlNDjU800Jz/view?usp=drive_link)
+- [Layers](https://drive.google.com/file/d/1L2RE9M-ifScTN4iVZZylJnwucsvL4SXC/view?usp=drive_link)
+- [Play pause](https://drive.google.com/file/d/1gofUeWij20XqOdNcklVOScAfw5N5X524/view?usp=drive_link)
+- [Clear everything](https://drive.google.com/file/d/1qexbuGmClx62_Yw71mvwQgHmNQgGd3Uz/view?usp=drive_link)
+- [Arrow forest impl](https://drive.google.com/file/d/1NO4IOhxl9qeW_rFrcJnkggUhZ9VL2MDk/view?usp=drive_link)
+- [Moving people impl](https://drive.google.com/file/d/1J3NKD13mr3mqF9ABOLWlUX5N8lL8uIDE/view?usp=drive_link)
+
 ## Key Features
 
 - **Interface and Controls**
