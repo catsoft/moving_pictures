@@ -34,6 +34,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
+// todo need to split view model to states and use cases
 @OptIn(ExperimentalCoroutinesApi::class)
 class CanvasViewModel() : ViewModel() {
     val drawSettings: MutableStateFlow<DrawSettings> = MutableStateFlow(DrawSettings())
@@ -52,6 +53,7 @@ class CanvasViewModel() : ViewModel() {
     val currentTool: MutableStateFlow<ControlTool> = MutableStateFlow(ControlTool.PEN)
     val fullPalettePopup: MutableStateFlow<Boolean> = MutableStateFlow(false)
     val layersPopup: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val settingsPopup: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     val undoButtonState = currentFrame.flatMapLatest { it?.canUndo ?: MutableStateFlow(false) }.combineStateWithPlayState {
         it.idleOrDisabled()
@@ -86,6 +88,7 @@ class CanvasViewModel() : ViewModel() {
     val eraserButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.ERASER).activeOrIdle() }
     val colorButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.COLOR_PICKER).activeOrIdle() }
     val editButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.SHAPES).activeOrIdle() }
+    val settingsButtonState = settingsPopup.combineStateWithPlayState { it.activeOrIdle() }
 
     init {
         gifComposer.addFrame(Frame())
@@ -115,16 +118,8 @@ class CanvasViewModel() : ViewModel() {
         currentFrame.value?.redo()
     }
 
-    fun selectColor(color: Color) {
-        drawSettings.value = drawSettings.value.copy(color = color)
-    }
-
-    fun setPenSize(value: Float) {
-        drawSettings.value = drawSettings.value.copy(penSize = value)
-    }
-
-    fun setEraseSize(value: Float) {
-        drawSettings.value = drawSettings.value.copy(eraseSize = value)
+    fun updateSettings(action: (DrawSettings) -> DrawSettings) {
+        drawSettings.value = action(drawSettings.value)
     }
 
     fun addNewFrame() {
@@ -190,9 +185,28 @@ class CanvasViewModel() : ViewModel() {
         drawSettings.value = drawSettings.value.copy(centerX = size.width / 2F, centerY = size.height / 2F, shapeSize = size.width.toFloat() * 0.32F)
     }
 
+    fun openSettings() {
+        val newState = settingsPopup.value
+        closeAllPopups()
+        settingsPopup.value = newState.not()
+    }
+
+    fun startOver() {
+        closeAllPopups()
+        gifComposer.clear()
+        gifComposer.addFrame(Frame())
+        gifState.selectLastFrame()
+    }
+
+    fun generateMovingPictures() {
+        closeAllPopups()
+        // todo
+    }
+
     private fun closeAllPopups() {
         fullPalettePopup.value = false
         layersPopup.value = false
+        settingsPopup.value = false
     }
 
     private fun <T> Flow<T>.combineStateWithPlayState(getState: (T) -> ControllableState): StateFlow<ControllableState> {

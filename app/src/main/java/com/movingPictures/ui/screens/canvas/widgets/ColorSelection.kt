@@ -132,7 +132,7 @@ fun BoxScope.ColorFullPalettePickerPopup(
 }
 
 private fun selectColor(viewModel: CanvasViewModel, color: Color) {
-    viewModel.selectColor(color)
+    viewModel.updateSettings { it.copy(color = color) }
     viewModel.selectTool(ControlTool.PEN)
     viewModel.fullPalettePopup.value = false
 }

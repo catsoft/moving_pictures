@@ -5,16 +5,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Slider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawWithCache
@@ -22,12 +18,8 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Popup
-import com.movingPictures.data.dto.Frame
 import com.movingPictures.ui.screens.canvas.CanvasViewModel
 import com.movingPictures.ui.theme.colors.ColorPalette
-import kotlin.math.cos
-import kotlin.math.sin
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -36,6 +28,7 @@ fun BoxScope.ThicknessSlider(
     modifier: Modifier = Modifier,
     show: Boolean,
     viewModel: CanvasViewModel,
+    range: ClosedFloatingPointRange<Float>,
     thickness: MutableState<Float>,
 ) {
     Popup(modifier, isShown = show) {
@@ -44,7 +37,7 @@ fun BoxScope.ThicknessSlider(
                 .size(200.dp, (52 - 32).dp)
         ) {
             Slider(
-                valueRange = 1f..50f,
+                valueRange = range,
                 value = thickness.value,
                 onValueChange = { thickness.value = it },
                 thumb = { Thumb() },

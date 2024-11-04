@@ -14,4 +14,11 @@ data class DrawSettings(
 
     val centerX: Float = 500F,
     val centerY: Float = 500F,
-)
+) {
+    companion object {
+        val penRange = 1F..100F
+        val eraseRange = 1F..100F
+        val shapeSizeRange = 100F..1000F
+        val shapeWidthRange = 1F..100F
+    }
+}

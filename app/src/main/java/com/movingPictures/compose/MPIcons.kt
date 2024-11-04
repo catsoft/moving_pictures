@@ -64,6 +64,9 @@ object MPIcons {
     fun IcLoading(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_loading, modifier, tint)
 
     @Composable
+    fun IcDots(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_dots, modifier, tint)
+
+    @Composable
     fun IcPlay(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_play, modifier, tint)
 
     @Composable

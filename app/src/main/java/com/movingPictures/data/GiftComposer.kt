@@ -45,5 +45,10 @@ class GiftComposer(initGif: Gif = Gif(listOf())) {
         frames.tryEmit(_frames)
     }
 
+    fun clear() {
+        _frames.clear()
+        frames.tryEmit(_frames)
+    }
+
     fun composeGif(): Gif = Gif(_frames.map { it.composeFrame() })
 }
