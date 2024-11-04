@@ -2,6 +2,17 @@
 
 An Android application designed for frame-by-frame animation creation, allowing users to draw and playback animations on their smartphones. This app pays homage to early animation devices such as the phenakistoscope and zoetrope.
 
+## Knowing issues
+- No blocking execution on actions
+  - Fix by moving all actions to IO\Default state and do at least screen blocking
+  - You can reproduce it on fast layer duplication
+- Glowing on popups
+  - It's because of the custom BlurSurface implementation. It's cool and easy solution for that short time, but it can be fixed by reworking the layer snapshot
+- Drawing object optimization
+  - Have to optimize Path, Offset, and eth
+  - It should use hashmap for drawing objects to cached objects
+
+
 ## Key Features
 
 - **Interface and Controls**
