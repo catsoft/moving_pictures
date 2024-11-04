@@ -12,16 +12,18 @@ class GiftComposer(initGif: Gif = Gif(listOf())) {
         frames.tryEmit(_frames)
     }
 
-    fun addFrame(frame: Frame, position: Int? = null) {
+    fun addFrame(frame: Frame, position: Int? = null): String {
+        val composer = FrameComposer(frame)
         if (position != null) {
-            _frames.add(position, FrameComposer(frame))
+            _frames.add(position, composer)
         } else {
-            _frames.add(FrameComposer(frame))
+            _frames.add(composer)
         }
         for (i in _frames.indices) {
             _frames[i].number = i + 1L
         }
         frames.tryEmit(_frames)
+        return composer.id
     }
 
     fun moveFrame(frameId: String, newPosition: Int) {

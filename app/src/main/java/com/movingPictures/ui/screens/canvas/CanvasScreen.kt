@@ -45,10 +45,11 @@ fun CanvasScreen(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
         }
 
         val tools = viewModel.currentTool.collectAsState()
-        ColorPickerPopup(tools.value == ControlTool.COLOR_PICKER, viewModel)
+        val playState = viewModel.gifPlayer.playState.collectAsState()
+        ColorPickerPopup(tools.value == ControlTool.COLOR_PICKER && playState.value == PlayState.PAUSED, viewModel)
 
         val fullPalette = viewModel.fullPalette.collectAsState()
-        ColorFullPalettePickerPopup(fullPalette.value, viewModel)
+        ColorFullPalettePickerPopup(fullPalette.value && playState.value == PlayState.PAUSED, viewModel)
 
         val settings = viewModel.drawSettings.collectAsState()
         val penThickness = remember { mutableFloatStateOf(settings.value.penSize) }
@@ -59,7 +60,7 @@ fun CanvasScreen(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 82.dp),
-            show = tools.value == ControlTool.PEN,
+            show = tools.value == ControlTool.PEN && playState.value == PlayState.PAUSED,
             viewModel = viewModel,
             thickness = penThickness
         )
@@ -72,7 +73,7 @@ fun CanvasScreen(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 82.dp),
-            show = tools.value == ControlTool.ERASER,
+            show = tools.value == ControlTool.ERASER && playState.value == PlayState.PAUSED,
             viewModel = viewModel,
             thickness = eraserThickness
         )
@@ -91,7 +92,7 @@ fun CanvasScreen(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 82.dp),
-            show = tools.value == ControlTool.SHAPES,
+            show = tools.value == ControlTool.SHAPES && playState.value == PlayState.PAUSED,
             viewModel
         )
     }
@@ -120,9 +121,14 @@ fun TopBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             MPIcons.IcBin(mediumIconModifier)
         }
 
-        val addButtonState = viewModel.addButtonState.collectAsState()
-        ControllableIcon(Modifier.padding(start = 16.dp), addButtonState.value, clickAction = { viewModel.addNewFrame() }) {
+        val addNewButtonState = viewModel.addNewButtonState.collectAsState()
+        ControllableIcon(Modifier.padding(start = 16.dp), addNewButtonState.value, clickAction = { viewModel.addNewFrame() }) {
             MPIcons.IcAddFile(mediumIconModifier)
+        }
+
+        val copyButtonState = viewModel.copyButtonState.collectAsState()
+        ControllableIcon(Modifier.padding(start = 16.dp), copyButtonState.value, clickAction = { viewModel.copyFrame() }) {
+            MPIcons.IcCopy(mediumIconModifier)
         }
 
         val layersButtonState = viewModel.layersButtonState.collectAsState()

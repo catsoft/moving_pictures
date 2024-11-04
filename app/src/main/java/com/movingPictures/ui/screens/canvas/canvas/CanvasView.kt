@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -128,15 +127,6 @@ private fun BoxScope.DrawFrame(
 ) {
     val frameState = composer.drawableState.collectAsState(listOf())
     val canvasState = composer.canvasState.collectAsState()
-    LaunchedEffect(frameState.value) {
-        frameState.value.forEach {
-            Log.d("DrawFrame", "drawable: $it")
-        }
-    }
-
-    LaunchedEffect(canvasState.value) {
-        Log.d("DrawFrame", "canvasState: $canvasState")
-    }
 
     Canvas(
         modifier

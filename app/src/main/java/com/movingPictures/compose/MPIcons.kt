@@ -27,6 +27,10 @@ object MPIcons {
     fun IcAddFile(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_add_file, modifier, tint)
 
     @Composable
+    fun IcCopy(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_copy, modifier, tint)
+
+
+    @Composable
     fun IcBrush(modifier: Modifier = Modifier, tint: Color? = LocalContentColor.current) = ChatfuelIcon(R.drawable.ic_brush, modifier, tint)
 
     @Composable

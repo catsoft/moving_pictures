@@ -75,7 +75,8 @@ class CanvasViewModel() : ViewModel() {
     }.stateIn(viewModelScope, SharingStarted.Eagerly, ControllableState.DISABLED)
 
     val deleteButtonState = gifComposer.frames.combineStateWithPlayState { (it.size > 1).idleOrDisabled() }
-    val addButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
+    val addNewButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
+    val copyButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
     val layersButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
 
     val moveButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.MOVE).activeOrIdle() }
@@ -127,8 +128,16 @@ class CanvasViewModel() : ViewModel() {
 
     fun addNewFrame() {
         currentFrame.value ?: return
-        gifComposer.addFrame(currentFrame.value!!.composeFrame())
-        gifState.selectLastFrame()
+        val newFrame = Frame()
+        val id = gifComposer.addFrame(newFrame)
+        gifState.selectFrame(id)
+    }
+
+    fun copyFrame() {
+        currentFrame.value ?: return
+        val frame = currentFrame.value!!.composeFrame()
+        val id = gifComposer.addFrame(frame)
+        gifState.selectFrame(id)
     }
 
     fun deleteFrame() {
@@ -137,7 +146,10 @@ class CanvasViewModel() : ViewModel() {
         gifState.selectLastFrame()
     }
 
-    fun play() = gifPlayer.play()
+    fun play() {
+        fullPalette.value = false
+        gifPlayer.play()
+    }
 
     fun pause() = gifPlayer.pause()
 
