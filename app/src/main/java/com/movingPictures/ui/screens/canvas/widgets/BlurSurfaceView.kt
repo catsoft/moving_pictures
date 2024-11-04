@@ -99,7 +99,11 @@ class BlurSurfaceView : View {
         canvas?.save()
         canvas?.translate(-left.toFloat(), -top.toFloat()) //translates the initial position
         canvas?.let {
-            parent.draw(it)
+            try {
+                parent.draw(it)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
         canvas?.restore()
         blurWithRenderScript()

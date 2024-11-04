@@ -23,7 +23,8 @@ import com.movingPictures.ui.screens.canvas.widgets.ColorFullPalettePickerPopup
 import com.movingPictures.ui.screens.canvas.widgets.ColorPicker
 import com.movingPictures.ui.screens.canvas.widgets.ColorPickerPopup
 import com.movingPictures.ui.screens.canvas.widgets.ControllableIcon
-import com.movingPictures.ui.screens.canvas.widgets.FrameNumbers
+import com.movingPictures.ui.screens.canvas.widgets.ControllableState
+import com.movingPictures.ui.screens.canvas.widgets.LayersPopup
 import com.movingPictures.ui.screens.canvas.widgets.ShapeSelector
 import com.movingPictures.ui.screens.canvas.widgets.ThicknessSlider
 import com.movingPictures.ui.screens.canvas.widgets.mediumIconModifier
@@ -48,7 +49,7 @@ fun CanvasScreen(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
         val playState = viewModel.gifPlayer.playState.collectAsState()
         ColorPickerPopup(tools.value == ControlTool.COLOR_PICKER && playState.value == PlayState.PAUSED, viewModel)
 
-        val fullPalette = viewModel.fullPalette.collectAsState()
+        val fullPalette = viewModel.fullPalettePopup.collectAsState()
         ColorFullPalettePickerPopup(fullPalette.value && playState.value == PlayState.PAUSED, viewModel)
 
         val settings = viewModel.drawSettings.collectAsState()
@@ -78,22 +79,20 @@ fun CanvasScreen(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             thickness = eraserThickness
         )
 
-        val currentFrame = viewModel.currentFrame.collectAsState()
-        val previousFrame = viewModel.previousFrame.collectAsState()
-        FrameNumbers(
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .padding(start = 16.dp, top = 82.dp),
-            currentFrame.value,
-            previousFrame.value
-        )
-
         ShapeSelector(
             Modifier
                 .align(Alignment.BottomCenter)
                 .padding(bottom = 82.dp),
             show = tools.value == ControlTool.SHAPES && playState.value == PlayState.PAUSED,
             viewModel
+        )
+
+        val layersState = viewModel.layersButtonState.collectAsState()
+        LayersPopup(
+            Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 82.dp, start = 24.dp, end = 24.dp),
+            layersState.value == ControllableState.ACTIVE, viewModel
         )
     }
 }
@@ -132,7 +131,10 @@ fun TopBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
         }
 
         val layersButtonState = viewModel.layersButtonState.collectAsState()
-        ControllableIcon(Modifier.padding(start = 16.dp), layersButtonState.value, clickAction = { }) {
+        ControllableIcon(
+            Modifier.padding(start = 16.dp),
+            layersButtonState.value,
+            clickAction = { viewModel.layersPopup.value = viewModel.layersPopup.value.not() }) {
             MPIcons.IcLayers(mediumIconModifier)
         }
 

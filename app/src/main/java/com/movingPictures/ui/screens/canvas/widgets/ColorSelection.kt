@@ -87,9 +87,9 @@ fun BoxScope.ColorPickerPopup(
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp),
         ) {
-            val isShownFullPalette = viewModel.fullPalette.collectAsState()
+            val isShownFullPalette = viewModel.fullPalettePopup.collectAsState()
             val state = if (isShownFullPalette.value) ControllableState.ACTIVE else ControllableState.IDLE
-            ControllableIcon(Modifier, state, clickAction = { viewModel.fullPalette.value = !isShownFullPalette.value }) {
+            ControllableIcon(Modifier, state, clickAction = { viewModel.fullPalettePopup.value = !isShownFullPalette.value }) {
                 MPIcons.IcColorPalette(modifier = mediumIconModifier)
             }
 
@@ -134,5 +134,5 @@ fun BoxScope.ColorFullPalettePickerPopup(
 private fun selectColor(viewModel: CanvasViewModel, color: Color) {
     viewModel.selectColor(color)
     viewModel.selectTool(ControlTool.PEN)
-    viewModel.fullPalette.value = false
+    viewModel.fullPalettePopup.value = false
 }

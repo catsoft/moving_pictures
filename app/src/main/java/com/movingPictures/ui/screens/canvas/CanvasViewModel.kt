@@ -50,7 +50,8 @@ class CanvasViewModel() : ViewModel() {
     val currentFrame = gifState.currentFrame
 
     val currentTool: MutableStateFlow<ControlTool> = MutableStateFlow(ControlTool.PEN)
-    val fullPalette: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val fullPalettePopup: MutableStateFlow<Boolean> = MutableStateFlow(false)
+    val layersPopup: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     val undoButtonState = currentFrame.flatMapLatest { it?.canUndo ?: MutableStateFlow(false) }.combineStateWithPlayState {
         it.idleOrDisabled()
@@ -77,7 +78,7 @@ class CanvasViewModel() : ViewModel() {
     val deleteButtonState = gifComposer.frames.combineStateWithPlayState { (it.size > 1).idleOrDisabled() }
     val addNewButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
     val copyButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
-    val layersButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
+    val layersButtonState = layersPopup.combineStateWithPlayState { it.activeOrIdle() }
 
     val moveButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.MOVE).activeOrIdle() }
     val penButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.PEN).activeOrIdle() }
@@ -93,7 +94,7 @@ class CanvasViewModel() : ViewModel() {
 
     fun selectTool(tool: ControlTool) {
         if (tool != ControlTool.COLOR_PICKER) {
-            fullPalette.value = false
+            fullPalettePopup.value = false
         }
         currentTool.value = tool
     }
@@ -127,28 +128,38 @@ class CanvasViewModel() : ViewModel() {
     }
 
     fun addNewFrame() {
+        closeAllPopups()
         currentFrame.value ?: return
         val newFrame = Frame()
-        val id = gifComposer.addFrame(newFrame)
+        val id = gifComposer.addFrame(newFrame, currentFrame.value!!.id)
         gifState.selectFrame(id)
     }
 
     fun copyFrame() {
+        closeAllPopups()
         currentFrame.value ?: return
         val frame = currentFrame.value!!.composeFrame()
-        val id = gifComposer.addFrame(frame)
+        val id = gifComposer.addFrame(frame, currentFrame.value!!.id)
         gifState.selectFrame(id)
     }
 
     fun deleteFrame() {
+        closeAllPopups()
         currentFrame.value ?: return
-        gifComposer.removeFrame(currentFrame.value!!.id)
-        gifState.selectLastFrame()
+        val previousId = previousFrame.value!!.id
+        val id = currentFrame.value!!.id
+        gifComposer.removeFrame(id)
+        gifState.selectFrame(previousId)
     }
 
     fun play() {
-        fullPalette.value = false
+        closeAllPopups()
         gifPlayer.play()
+    }
+
+    fun selectFrameFromList(id: String) {
+        gifState.selectFrame(id)
+        closeAllPopups()
     }
 
     fun pause() = gifPlayer.pause()
@@ -174,6 +185,11 @@ class CanvasViewModel() : ViewModel() {
 
     fun setCanvasSize(size: IntSize) {
         drawSettings.value = drawSettings.value.copy(centerX = size.width / 2F, centerY = size.height / 2F, shapeSize = size.width.toFloat() * 0.32F)
+    }
+
+    private fun closeAllPopups() {
+        fullPalettePopup.value = false
+        layersPopup.value = false
     }
 
     private fun <T> Flow<T>.combineStateWithPlayState(getState: (T) -> ControllableState): StateFlow<ControllableState> {
