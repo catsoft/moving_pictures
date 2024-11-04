@@ -15,6 +15,9 @@ import com.movingPictures.data.dto.Frame
 import com.movingPictures.data.dto.MoveCanvasAction
 import com.movingPictures.data.dto.PenDrawableItem
 import com.movingPictures.data.dto.Point
+import com.movingPictures.data.generators.ArrowForestGenerator
+import com.movingPictures.data.generators.Generator
+import com.movingPictures.data.generators.MovingPicturesGenerator
 import com.movingPictures.ui.screens.canvas.canvas.EraserActionController
 import com.movingPictures.ui.screens.canvas.canvas.MoveActionController
 import com.movingPictures.ui.screens.canvas.canvas.PenActionController
@@ -198,9 +201,16 @@ class CanvasViewModel() : ViewModel() {
         gifState.selectLastFrame()
     }
 
-    fun generateMovingPictures() {
+    fun generateArrowForest() = generate(ArrowForestGenerator(gifComposer))
+
+    fun generateMovingPictures() = generate(MovingPicturesGenerator(gifComposer))
+
+    private fun generate(generator: Generator) {
         closeAllPopups()
-        // todo
+        viewModelScope.launch {
+            generator.generate(drawSettings.value)
+            gifState.selectLastFrame()
+        }
     }
 
     private fun closeAllPopups() {

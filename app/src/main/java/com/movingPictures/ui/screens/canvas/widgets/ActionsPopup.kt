@@ -31,8 +31,12 @@ fun BoxScope.ActionsPopup(
         Column(
             verticalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            ClickTitle("Generate Moving Picture") {
-                viewModel.startOver()
+            ClickTitle("Generate Moving Pictures") {
+                viewModel.generateMovingPictures()
+            }
+
+            ClickTitle("Generate Arrow Forest") {
+                viewModel.generateArrowForest()
             }
 
             ClickTitle("Clear everything") {

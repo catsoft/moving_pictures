@@ -140,7 +140,8 @@ private fun BoxScope.DrawFrame(
             for (drawable in frameState.value) {
                 withTransform({
                     translate(left = drawable.state.position.x, top = drawable.state.position.y)
-                    rotate(drawable.state.rotation)
+                    // have to change +90F because of the android coordinate system
+                    rotate(drawable.state.rotation + 90F, Offset(0F, 0F))
                 }) {
                     when (drawable) {
                         is PenDrawableItem -> drawPen(drawable)
