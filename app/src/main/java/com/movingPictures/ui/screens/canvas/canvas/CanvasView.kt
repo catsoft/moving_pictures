@@ -45,6 +45,7 @@ import com.movingPictures.data.dto.PenDrawableItem
 import com.movingPictures.data.dto.SquareDrawableItem
 import com.movingPictures.data.dto.TriangleDrawableItem
 import com.movingPictures.ui.screens.canvas.CanvasViewModel
+import com.movingPictures.ui.screens.canvas.PlayState
 import com.movingpictures.R
 
 // todo need objects in draw optimization
@@ -52,6 +53,7 @@ import com.movingpictures.R
 fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
     val previousFrame = viewModel.previousFrame.collectAsState()
     val currentFrame = viewModel.currentFrame.collectAsState()
+    val playState = viewModel.gifPlayer.playState.collectAsState()
 
     Box(
         modifier
@@ -77,7 +79,7 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
             )
 
             // z index for right drawing order
-            if (previousFrame.value != null) {
+            if (previousFrame.value != null && playState.value == PlayState.PAUSED) {
                 Log.d("CanvasView", "draw previousFrame")
                 DrawFrame(
                     Modifier
