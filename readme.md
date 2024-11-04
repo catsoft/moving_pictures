@@ -1,6 +1,9 @@
 # Moving Pictures (Android) - Yandex Cup 2024
 
 An Android application designed for frame-by-frame animation creation, allowing users to draw and playback animations on their smartphones. This app pays homage to early animation devices such as the phenakistoscope and zoetrope.
+- [Google Play](https://play.google.com/store/apps/details?id=com.movingpictures) (not reviewed yet)
+
+![Moving People](images/moving_pictures.gif "moving people")
 
 ## Knowing issues
 - No blocking execution on actions
