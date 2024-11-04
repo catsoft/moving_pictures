@@ -12,6 +12,8 @@ An Android application designed for frame-by-frame animation creation, allowing 
   - Have to optimize Path, Offset, and eth
   - It should use hashmap for drawing objects to cached objects
 
+## Implementations
+- [All features with videos](https://drive.google.com/drive/folders/1MnbSmebaZYbH1EDEs9NnTONmD3n-J2JU?usp=drive_link)
 
 ## Key Features
 
