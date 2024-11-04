@@ -2,6 +2,8 @@
 
 An Android application designed for frame-by-frame animation creation, allowing users to draw and playback animations on their smartphones. This app pays homage to early animation devices such as the phenakistoscope and zoetrope.
 
+![Moving People](images/moving_pictures.gif "moving people")
+
 ## Knowing issues
 - No blocking execution on actions
   - Fix by moving all actions to IO\Default state and do at least screen blocking
