@@ -17,7 +17,7 @@ class PenActionController(canvasViewModel: CanvasViewModel) {
             drawable.value = drawable.value!!.copy(
                 points = drawable.value!!.points + PointColors(
                     offset.toPoint(drawable.value!!.state.position),
-                    canvasViewModel.drawSettings.value.color.toArgb()
+                    canvasViewModel.drawSettings.value.color.toArgb(),
                 )
             )
         } else {

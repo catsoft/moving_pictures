@@ -1,15 +1,15 @@
-package com.movingPictures.ui.screens.canvas.canvas
-
-import androidx.compose.foundation.gestures.detectDragGestures
+import android.view.MotionEvent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import com.movingPictures.ui.screens.canvas.CanvasViewModel
 import com.movingPictures.ui.screens.canvas.ControlTool
 import com.movingPictures.ui.screens.canvas.PlayState
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun onCurrentTool(viewModel: CanvasViewModel): Modifier {
     val tool = viewModel.currentTool.collectAsState()
@@ -39,17 +39,25 @@ fun onCurrentTool(viewModel: CanvasViewModel): Modifier {
         }
     }
 
-    // todo gonna be work better with onTouchEvent because onDragUpdate have a slope
-    return Modifier.pointerInput(Unit) {
-        detectDragGestures(
-            onDragStart = { offset -> onDrawUpdate(offset) },
-            onDragEnd = { onCancel() },
-            onDragCancel = { onCancel() },
-            onDrag = { change, dragAmount ->
-                change.consume()
-                onDrawUpdate(change.position)
+    return Modifier.pointerInteropFilter { event ->
+        val offset = Offset(event.x, event.y)
+        when (event.action) {
+            MotionEvent.ACTION_DOWN -> {
+                onDrawUpdate(offset)
+                true
             }
-        )
+
+            MotionEvent.ACTION_MOVE -> {
+                onDrawUpdate(offset)
+                true
+            }
+
+            MotionEvent.ACTION_UP, MotionEvent.ACTION_CANCEL -> {
+                onCancel()
+                true
+            }
+
+            else -> false
+        }
     }
 }
-

@@ -46,6 +46,7 @@ import com.movingPictures.data.dto.TriangleDrawableItem
 import com.movingPictures.ui.screens.canvas.CanvasViewModel
 import com.movingPictures.ui.screens.canvas.PlayState
 import com.movingpictures.R
+import onCurrentTool
 
 // todo need objects in draw optimization
 @Composable
@@ -105,7 +106,7 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
                 DrawFrame(Modifier.zIndex(2F), frameComposer)
             }
 
-            val currentEraserDrawableItem = viewModel.penController.drawable
+            val currentEraserDrawableItem = viewModel.eraserController.drawable
             if (currentEraserDrawableItem.value != null) {
                 Log.d("CanvasView", "draw eraser")
                 val frameComposer = FrameComposer()
