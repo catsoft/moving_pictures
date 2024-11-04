@@ -23,6 +23,7 @@ class EraserActionController(canvasViewModel: CanvasViewModel) {
         } else {
             drawable.value = EraserDrawableItem(
                 DrawableItemState(
+                    rotation = -90F,
                     position = offset.toPoint(),
                     color = canvasViewModel.drawSettings.value.eraseColor.toArgb()
                 ),

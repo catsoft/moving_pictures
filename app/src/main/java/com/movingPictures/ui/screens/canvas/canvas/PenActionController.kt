@@ -23,6 +23,7 @@ class PenActionController(canvasViewModel: CanvasViewModel) {
         } else {
             drawable.value = PenDrawableItem(
                 DrawableItemState(
+                    rotation = -90F,
                     position = offset.toPoint(),
                     color = canvasViewModel.drawSettings.value.color.toArgb()
                 ),
