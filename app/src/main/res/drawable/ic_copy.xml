@@ -4,7 +4,7 @@
     android:viewportWidth="32"
     android:viewportHeight="33">
 
-  <group android:translateX="-3" android:translateY="-3">
+  <group android:translateX="0" android:translateY="0" android:scaleX="0.9" android:scaleY="0.9">
     <path
         android:pathData="M24.552,9.302L20.781,5.531C20.281,5.031 19.603,4.75 18.896,4.75H9.333C7.86,4.75 6.667,5.943 6.667,7.417V26.083C6.667,27.557 7.86,28.75 9.333,28.75H22.667C24.14,28.75 25.333,27.557 25.333,26.083V11.187C25.333,10.481 25.052,9.802 24.552,9.302Z"
         android:strokeLineJoin="round"
@@ -23,7 +23,7 @@
   </group>
 
 
-  <group android:translateY="3" android:translateX="3">
+  <group android:translateY="4" android:translateX="4" android:scaleX="0.9" android:scaleY="0.9">
     <path
         android:pathData="M24.552,9.302L20.781,5.531C20.281,5.031 19.603,4.75 18.896,4.75H9.333C7.86,4.75 6.667,5.943 6.667,7.417V26.083C6.667,27.557 7.86,28.75 9.333,28.75H22.667C24.14,28.75 25.333,27.557 25.333,26.083V11.187C25.333,10.481 25.052,9.802 24.552,9.302Z"
         android:strokeLineJoin="round"
