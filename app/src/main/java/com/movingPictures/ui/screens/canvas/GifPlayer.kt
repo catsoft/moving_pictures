@@ -7,7 +7,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 enum class PlayerState {
@@ -22,7 +25,7 @@ enum class PlayState {
 
 //todo this one should be optimized, it should compile everything into bitmap and then play it
 class GifPlayer(private val gif: GiftComposer, private val gifState: GifState) {
-    private val scope = CoroutineScope(Dispatchers.Default)
+    private val scope = CoroutineScope(Dispatchers.Main)
     private var playJob: Job? = null
 
     val playerState: MutableStateFlow<PlayerState> = MutableStateFlow(PlayerState.NOT_READY)
@@ -30,9 +33,11 @@ class GifPlayer(private val gif: GiftComposer, private val gifState: GifState) {
 
     init {
         scope.launch {
-            gif.frames.collectLatest {
-                playerState.value = if (it.size > 1) PlayerState.READY else PlayerState.NOT_READY
-            }
+            gif.frames.map { if (it.size > 1) PlayerState.READY else PlayerState.NOT_READY }
+                .stateIn(scope, SharingStarted.Eagerly, PlayerState.NOT_READY)
+                .collect {
+                    playerState.value = it
+                }
         }
     }
 

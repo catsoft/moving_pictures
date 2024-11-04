@@ -27,9 +27,7 @@ class GiftComposer(initGif: Gif = Gif(listOf())) {
         } else {
             _frames.add(composer)
         }
-        for (i in _frames.indices) {
-            _frames[i].number = i + 1L
-        }
+        indiciseFrames()
         frames.tryEmit(_frames)
         return composer.id
     }
@@ -37,17 +35,26 @@ class GiftComposer(initGif: Gif = Gif(listOf())) {
     fun moveFrame(frameId: String, newPosition: Int) {
         val frame = _frames.removeAt(_frames.indexOfFirst { it.id == frameId })
         _frames.add(newPosition, frame)
+        indiciseFrames()
         frames.tryEmit(_frames)
     }
 
     fun removeFrame(frameId: String) {
         _frames.removeAt(_frames.indexOfFirst { it.id == frameId })
+        indiciseFrames()
         frames.tryEmit(_frames)
     }
 
     fun clear() {
         _frames.clear()
+        indiciseFrames()
         frames.tryEmit(_frames)
+    }
+
+    private fun indiciseFrames() {
+        for (i in _frames.indices) {
+            _frames[i].number = i + 1L
+        }
     }
 
     fun composeGif(): Gif = Gif(_frames.map { it.composeFrame() })
