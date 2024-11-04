@@ -162,7 +162,10 @@ class CanvasViewModel() : ViewModel() {
         closeAllPopups()
     }
 
-    fun pause() = gifPlayer.pause()
+    fun pause() {
+        gifPlayer.pause()
+        gifState.selectLastFrame()
+    }
 
     fun addShapes(shape: Shape) {
         val settings = drawSettings.value

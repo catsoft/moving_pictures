@@ -27,8 +27,9 @@ class GifState(val gifComposer: GiftComposer) {
     fun selectFrame(frameId: String) {
         scope.launch {
             gifComposer.frames.collectLatest {
-                previousFrame.value = it.getOrNull(it.indexOfFirst { it.id == frameId } - 1)
-                currentFrame.value = it.firstOrNull { it.id == frameId }
+                val index = it.indexOfFirst { it.id == frameId }
+                previousFrame.value = it.getOrNull(index - 1) ?: if (it.size > 1) it.lastOrNull() else null
+                currentFrame.value = it.getOrNull(index)
             }
         }
     }
