@@ -2,11 +2,13 @@ package com.movingPictures.data
 
 import com.movingPictures.data.dto.Action
 import com.movingPictures.data.dto.AddAction
+import com.movingPictures.data.dto.CanvasState
 import com.movingPictures.data.dto.ChangeColorAction
 import com.movingPictures.data.dto.DrawableItem
 import com.movingPictures.data.dto.DrawableItemState
 import com.movingPictures.data.dto.Frame
 import com.movingPictures.data.dto.MoveAction
+import com.movingPictures.data.dto.MoveCanvasAction
 import com.movingPictures.data.dto.RemoveAction
 import com.movingPictures.data.dto.RotateAction
 import com.movingPictures.data.dto.ScaleAction
@@ -35,6 +37,9 @@ class FrameComposer(val initFrame: Frame = Frame()) {
     private val _drawableState = MutableSharedFlow<List<DrawableItem<*>>>(replay = 1)
     val drawableState: SharedFlow<List<DrawableItem<*>>> = _drawableState
 
+    private var _canvasState = initFrame.canvasState
+    val canvasState = MutableStateFlow(_canvasState)
+
     val canUndo: StateFlow<Boolean> = historyPosition.map { it > -1 }.stateIn(scope, SharingStarted.Eagerly, false)
     val canRedo: StateFlow<Boolean> = historyPosition.map { it < history.size - 1 }.stateIn(scope, SharingStarted.Eagerly, false)
 
@@ -56,8 +61,10 @@ class FrameComposer(val initFrame: Frame = Frame()) {
 
     private fun invalidateHistory() {
         state = mutableListOf()
+        _canvasState = CanvasState()
         history.take(historyPosition.value + 1).forEach { applyActionImpl(it) }
         _drawableState.tryEmit(state)
+        canvasState.value = _canvasState
     }
 
     fun applyAction(action: Action) {
@@ -68,6 +75,7 @@ class FrameComposer(val initFrame: Frame = Frame()) {
         history.add(action)
         historyPosition.value++
         _drawableState.tryEmit(state)
+        canvasState.value = _canvasState
     }
 
     private fun applyActionImpl(action: Action) {
@@ -78,10 +86,11 @@ class FrameComposer(val initFrame: Frame = Frame()) {
             is ChangeColorAction -> applyChangeColorAction(action)
             is RotateAction -> applyRotateAction(action)
             is ScaleAction -> applyScaleAction(action)
+            is MoveCanvasAction -> moveCanvas(action)
         }
     }
 
-    fun composeFrame(): Frame = Frame(duration, number, history, state, id)
+    fun composeFrame(): Frame = Frame(duration, number, history, state, _canvasState, id)
 
     private fun applyAddAction(action: AddAction) {
         state.add(action.item)
@@ -111,6 +120,10 @@ class FrameComposer(val initFrame: Frame = Frame()) {
         val drawable = state.find { it.id == drawableId } ?: return
         val newDrawable = drawable.copyWithState(state = update(drawable.state))
         replaceDrawable(drawableId, newDrawable)
+    }
+
+    private fun moveCanvas(offset: MoveCanvasAction) {
+        _canvasState = CanvasState(_canvasState.offsetX + offset.newOffset.offsetX, _canvasState.offsetY + offset.newOffset.offsetY)
     }
 
     private fun replaceDrawable(drawableId: String, newDrawable: DrawableItem<*>) {

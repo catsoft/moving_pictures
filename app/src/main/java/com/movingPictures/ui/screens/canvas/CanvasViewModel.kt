@@ -7,13 +7,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.movingPictures.data.GiftComposer
 import com.movingPictures.data.dto.AddAction
+import com.movingPictures.data.dto.CanvasState
 import com.movingPictures.data.dto.DrawableItem
 import com.movingPictures.data.dto.DrawableItemFactory
 import com.movingPictures.data.dto.DrawableItemState
 import com.movingPictures.data.dto.Frame
+import com.movingPictures.data.dto.MoveCanvasAction
 import com.movingPictures.data.dto.PenDrawableItem
 import com.movingPictures.data.dto.Point
 import com.movingPictures.ui.screens.canvas.canvas.EraserActionController
+import com.movingPictures.ui.screens.canvas.canvas.MoveActionController
 import com.movingPictures.ui.screens.canvas.canvas.PenActionController
 import com.movingPictures.ui.screens.canvas.widgets.ControllableState
 import com.movingPictures.ui.screens.canvas.widgets.Shape
@@ -41,6 +44,7 @@ class CanvasViewModel() : ViewModel() {
 
     val penController = PenActionController(this)
     val eraserController = EraserActionController(this)
+    val moveController = MoveActionController(this)
 
     val previousFrame = gifState.previousFrame
     val currentFrame = gifState.currentFrame
@@ -74,6 +78,7 @@ class CanvasViewModel() : ViewModel() {
     val addButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
     val layersButtonState = MutableStateFlow(ControllableState.IDLE).combineStateWithPlayState { it }
 
+    val moveButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.MOVE).activeOrIdle() }
     val penButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.PEN).activeOrIdle() }
     val brushButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.BRUSH).activeOrIdle() }
     val eraserButtonState = currentTool.combineStateWithPlayState { (it == ControlTool.ERASER).activeOrIdle() }
@@ -94,6 +99,10 @@ class CanvasViewModel() : ViewModel() {
 
     fun addDrawable(drawableItem: DrawableItem<*>) {
         currentFrame.value?.applyAction(AddAction(drawableItem))
+    }
+
+    fun moveCanvas(offset: CanvasState) {
+        currentFrame.value?.applyAction(MoveCanvasAction(offset))
     }
 
     fun undo() {

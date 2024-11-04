@@ -29,3 +29,7 @@ data class ScaleAction(
     val drawableId: String,
     val newScale: Float,
 ) : Action()
+
+data class MoveCanvasAction(
+    val newOffset: CanvasState,
+) : Action()

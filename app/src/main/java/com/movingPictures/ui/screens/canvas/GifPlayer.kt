@@ -8,7 +8,6 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.lastOrNull
 import kotlinx.coroutines.launch
 
 enum class PlayerState {
@@ -26,6 +25,9 @@ class GifPlayer(private val gif: GiftComposer, private val gifState: GifState) {
     private val scope = CoroutineScope(Dispatchers.Default)
     private var playJob: Job? = null
 
+    val playerState: MutableStateFlow<PlayerState> = MutableStateFlow(PlayerState.NOT_READY)
+    val playState = MutableStateFlow(PlayState.PAUSED)
+
     init {
         scope.launch {
             gif.frames.collectLatest {
@@ -33,9 +35,6 @@ class GifPlayer(private val gif: GiftComposer, private val gifState: GifState) {
             }
         }
     }
-
-    val playerState: MutableStateFlow<PlayerState> = MutableStateFlow(PlayerState.NOT_READY)
-    val playState = MutableStateFlow(PlayState.PAUSED)
 
     fun play() {
         playJob?.cancel()

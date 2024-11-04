@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.StrokeJoin.Companion.Round
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.DrawTransform
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.withTransform
 import androidx.compose.ui.layout.ContentScale
@@ -87,7 +88,12 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
 
             if (currentFrame.value != null) {
                 Log.d("CanvasView", "draw currentFrame")
-                DrawFrame(Modifier.zIndex(1F), currentFrame.value!!)
+                val currentMoveAction = viewModel.moveController.state.collectAsState()
+                DrawFrame(Modifier.zIndex(1F), currentFrame.value!!) {
+                    currentMoveAction.value?.let {
+                        translate(left = currentMoveAction.value?.offsetX ?: 0F, top = currentMoveAction.value?.offsetY ?: 0F)
+                    }
+                }
             }
 
             val currentUserDrawableItem = viewModel.penController.drawable
@@ -113,34 +119,47 @@ fun CanvasView(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
 }
 
 @Composable
-private fun BoxScope.DrawFrame(modifier: Modifier = Modifier, composer: FrameComposer, zIndex: Float = 0F) {
+private fun BoxScope.DrawFrame(
+    modifier: Modifier = Modifier,
+    composer: FrameComposer,
+    transformBlock: DrawTransform.() -> Unit = {}
+) {
     val frameState = composer.drawableState.collectAsState(listOf())
+    val canvasState = composer.canvasState.collectAsState()
     LaunchedEffect(frameState.value) {
         frameState.value.forEach {
             Log.d("DrawFrame", "drawable: $it")
         }
     }
 
+    LaunchedEffect(canvasState.value) {
+        Log.d("DrawFrame", "canvasState: $canvasState")
+    }
+
     Canvas(
         modifier
             .matchParentSize()
-            .zIndex(zIndex)
     ) {
-        for (drawable in frameState.value) {
-            withTransform({
-                translate(left = drawable.state.position.x, top = drawable.state.position.y)
-                rotate(drawable.state.rotation)
-            }) {
-                when (drawable) {
-                    is PenDrawableItem -> drawPen(drawable)
-                    is EraserDrawableItem -> drawEraser(drawable)
-                    is LineDrawableItem -> drawLine(drawable)
-                    is CircleDrawableItem -> drawCircle(drawable)
-                    is SquareDrawableItem -> drawSquare(drawable)
-                    is TriangleDrawableItem -> drawTriangle(drawable)
-                    is ArrowDrawableItem -> drawArrow(drawable)
-                    else -> {
-                        throw IllegalArgumentException("Unknown drawable type: ${drawable::class.java.simpleName}")
+        withTransform({
+            transformBlock()
+            translate(left = canvasState.value.offsetX, top = canvasState.value.offsetY)
+        }) {
+            for (drawable in frameState.value) {
+                withTransform({
+                    translate(left = drawable.state.position.x, top = drawable.state.position.y)
+                    rotate(drawable.state.rotation)
+                }) {
+                    when (drawable) {
+                        is PenDrawableItem -> drawPen(drawable)
+                        is EraserDrawableItem -> drawEraser(drawable)
+                        is LineDrawableItem -> drawLine(drawable)
+                        is CircleDrawableItem -> drawCircle(drawable)
+                        is SquareDrawableItem -> drawSquare(drawable)
+                        is TriangleDrawableItem -> drawTriangle(drawable)
+                        is ArrowDrawableItem -> drawArrow(drawable)
+                        else -> {
+                            throw IllegalArgumentException("Unknown drawable type: ${drawable::class.java.simpleName}")
+                        }
                     }
                 }
             }
@@ -241,14 +260,14 @@ private fun DrawScope.drawArrow(drawable: ArrowDrawableItem) {
     val height = drawable.size
     val width = drawable.size * 0.68F
 
-    Path().apply {
+    val path = Path().apply {
         moveTo(0F, height / 2)
         lineTo(0F, -height / 2)
         lineTo(-width / 2, -(width / 2) * 0.70F)
         moveTo(0F, -height / 2)
         lineTo(width / 2, -(width / 2) * 0.70F)
     }
-    drawPath(path = arrowPath, color = Color(drawable.state.color), style = drawable.width.toStroke())
+    drawPath(path = path, color = Color(drawable.state.color), style = drawable.width.toStroke())
 }
 
 @Composable

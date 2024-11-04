@@ -10,6 +10,7 @@ data class Frame(
     val number: Long = 1,
     val history: MutableList<Action> = mutableListOf(),
     val currentState: MutableList<DrawableItem<*>> = mutableListOf(),
+    val canvasState: CanvasState = CanvasState(),
     val id: String = UUID.randomUUID().toString(),
 )
 
@@ -21,4 +22,9 @@ data class Point(
 data class PointColors(
     val point: Point,
     val color: Int,
+)
+
+data class CanvasState(
+    val offsetX: Float = 0F,
+    val offsetY: Float = 0F,
 )

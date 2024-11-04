@@ -1,6 +1,5 @@
 package com.movingPictures.ui.screens.canvas
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -154,15 +153,20 @@ fun BottomBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
         Row(
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
+            val moveState = viewModel.moveButtonState.collectAsState()
+            ControllableIcon(Modifier, moveState.value, clickAction = { viewModel.selectTool(ControlTool.MOVE) }) {
+                MPIcons.IcEdit(modifier = mediumIconModifier)
+            }
+
             val penButtonState = viewModel.penButtonState.collectAsState()
             ControllableIcon(Modifier, penButtonState.value, clickAction = { viewModel.selectTool(ControlTool.PEN) }) {
                 MPIcons.IcPencil(modifier = mediumIconModifier)
             }
 
-            val brushState = viewModel.brushButtonState.collectAsState()
-            ControllableIcon(Modifier, brushState.value, clickAction = { viewModel.selectTool(ControlTool.BRUSH) }) {
-                MPIcons.IcBrush(modifier = mediumIconModifier)
-            }
+//            val brushState = viewModel.brushButtonState.collectAsState()
+//            ControllableIcon(Modifier, brushState.value, clickAction = { viewModel.selectTool(ControlTool.BRUSH) }) {
+//                MPIcons.IcBrush(modifier = mediumIconModifier)
+//            }
 
             val eraseState = viewModel.eraserButtonState.collectAsState()
             ControllableIcon(Modifier, eraseState.value, clickAction = { viewModel.selectTool(ControlTool.ERASER) }) {
@@ -171,7 +175,7 @@ fun BottomBar(modifier: Modifier = Modifier, viewModel: CanvasViewModel) {
 
             val editState = viewModel.editButtonState.collectAsState()
             ControllableIcon(mediumIconModifier, editState.value, clickAction = { viewModel.selectTool(ControlTool.SHAPES) }) {
-                MPIcons.IcEdit(modifier = mediumIconModifier)
+                MPIcons.IcShapes(modifier = mediumIconModifier)
             }
 
             ColorPicker(Modifier, viewModel)
